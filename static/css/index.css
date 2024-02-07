@@ -1,0 +1,33 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-button {
+    width: 20%;
+    height: 60px;
+    margin: 30px; /* Aumentar la separación entre los botones */
+    border: none;
+}
+
+.altru-login {
+    background-color: #D9D9D9;
+    color: black;
+    font-family: 'inter';
+    font-size: 20px;  
+}
+
+.salesforce-login {
+    background-color: #D9D9D9;
+    color: black;
+    font-family: 'inter';
+    font-size: 20px;  
+}
+
+@media (max-width: 600px) {
+    .login-button {
+        width: 90%;
+    }
+}

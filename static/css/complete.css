@@ -1,0 +1,23 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.text-container {
+    text-align: center; /* Centra el texto dentro del div */
+    font-family: 'inter';
+}
+
+.text-container ul {
+    list-style-position: inside; /* Coloca las viñetas dentro del contenido del <li> */
+    padding-left: 0; /* Elimina el padding izquierdo */
+}
+
+.text-container li {
+    text-align: left; /* Alinea el texto a la izquierda */
+}
