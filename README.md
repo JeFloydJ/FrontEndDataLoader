@@ -8,8 +8,8 @@ python3 app.py
 esta correra en http://127.0.0.1:5000/.
 
 hasta el momento solo tiene:
-- Pagina principal
-- pagina para transferir data
-- pagina de data completa.
+- página principal: funcional con autorización en salesforce y autorización en altru
+- página para transferir data: solo visual.
+- página de data completa: Todo esto es solo visual.
 
-Todo esto es solo visual.
+
