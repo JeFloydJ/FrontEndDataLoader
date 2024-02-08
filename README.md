@@ -1,6 +1,6 @@
 ## FrontEndDataLoader
 Dependencias del proyecto:
-- Flask
+- Flask:
 para instalar corra el siguiente comando en terminal:
 ```bash
 pip install Flask
