@@ -11,7 +11,7 @@ para correr el proyecto ejecute en la terminal:
 ```bash
 python3 app.py
 ```
-esta correra en http://127.0.0.1:5000/.
+esta correra en http://127.0.0.1:8000/.
 
 hasta el momento solo tiene:
 - página principal: funcional con autorización en salesforce y autorización en altru
