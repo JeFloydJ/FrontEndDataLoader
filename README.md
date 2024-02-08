@@ -1,5 +1,11 @@
 ## FrontEndDataLoader
-para correr este proyecto asegurese de estar en la carpeta principal del proyecto.
+Dependencias del proyecto:
+- Flask
+para instalar corra el siguiente comando en terminal:
+```bash
+pip install Flask
+```
+Para correr este proyecto asegurese de estar en la carpeta principal del proyecto.
 para correr el proyecto ejecute en la terminal:
 
 ```bash
