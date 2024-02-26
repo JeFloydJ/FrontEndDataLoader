@@ -123,7 +123,6 @@
     text-align: left; 
 }
 
-/* Estilos para la pantalla de carga */
 #loading {
     display: flex;
     justify-content: center;
