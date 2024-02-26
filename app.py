@@ -79,10 +79,6 @@ def index():
     with open('altru_token.txt', 'r') as f:
         if(not(isEmpty(f))):
             loggedSkyApi = True
-
-    with open('altru_token.txt', 'r') as f:
-        if(not(isEmpty(f))):
-            loggedSkyApi = True
     
     for filename in special_files:
         with open((ABS_PATH.format(f'Events/{filename}')), 'r') as f:
