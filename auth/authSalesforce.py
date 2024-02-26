@@ -12,7 +12,7 @@ def authSalesforce():
     response_type = 'code'
 
     # Salesforce authentication URL
-    url = f"https://login.salesforce.com/services/oauth2/authorize?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}"
+    url = f"https://test.salesforce.com/services/oauth2/authorize?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}"
 
     # Define the payload and headers (both are empty in this case)
     headers = {}

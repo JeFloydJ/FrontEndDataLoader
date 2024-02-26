@@ -1,33 +1,126 @@
 .login-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: center; 
     align-items: center;
     height: 100vh;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-around;
+    width: 60%;
+}
+
+.Connected-button{
+    width: 100%; 
+    height: 60px;      
+    margin: 30px; 
+    border: none;
+    cursor: pointer;
+}
+
+.transfer-button {
+    width: 30%; 
+    height: 60px;
+    margin: 30px;
+    border: none;
+    cursor: pointer;
 }
 
 .login-button {
     width: 20%;
     height: 60px;
-    margin: 30px; /* Aumentar la separación entre los botones */
+    margin: 30px; 
     border: none;
 }
+
+.transfer-data-salesforce {
+    background-color: #D9D9D9;
+    color: black;
+    font-size: 20px;           
+}
+
 
 .altru-login {
     background-color: #D9D9D9;
     color: black;
-    font-family: 'inter';
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.app-button {
+    width:  50%; 
+    height: 60px; 
+    margin: 30px; 
+    border: none;
+    background-color: #D9D9D9;
+    color: black;
     font-size: 20px;  
+    cursor: pointer;
 }
 
 .salesforce-login {
     background-color: #D9D9D9;
     color: black;
-    font-family: 'inter';
     font-size: 20px;  
+}
+
+.login-button-container {
+    display: flex;
+    justify-content: space-around; 
+    width: 60%;
 }
 
 @media (max-width: 600px) {
     .login-button {
         width: 90%;
     }
+}
+
+.app-button:hover {
+    background-color: #B8B8B8; 
+}
+
+.Connected-button:hover {
+    background-color: #B8B8B8; 
+}
+
+.transfer-button:hover {
+    background-color: #B8B8B8; 
+}
+
+.login-button:hover {
+    background-color: #B8B8B8; 
+}
+
+.salesforce-login:hover {
+    background-color: #B8B8B8; 
+}
+
+.app-button.connected,
+.Connected-button.connected {
+    background-color: #B8B8B8; 
+    cursor: default; 
+    color: #797979;
+}
+
+.app-button.connected:hover,
+.Connected-button.connected:hover {
+    background-color: #B8B8B8;
+    color: #797979; 
+}
+
+
+.text-container {
+    text-align: center; 
+}
+
+.text-container ul {
+    list-style-position: inside; 
+    padding-left: 0; 
+}
+
+.text-container li {
+    text-align: left; 
 }

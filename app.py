@@ -5,6 +5,10 @@ import requests
 import urllib.parse
 from auth.authAltru import authAltru
 from auth.authSalesforce import authSalesforce
+from Events.eventTransferDataOrganizations import Adapter
+import os
+
+ABS_PATH = os.path.join("/Users/juanestebanfloyd/Documents/FrontendDataLoader/App", "{}")
 
 # Set up logging
 logging.basicConfig(level=logging.INFO,
@@ -39,23 +43,71 @@ token_urls = {
     'altru': 'https://oauth2.sky.blackbaud.com/token'
 }
 
+# List of files with tokens
+token_files = ['altru_token.txt', 'altru_refresh_token.txt', 'salesforce_token.txt', 'salesforce_refresh_token.txt', 'salesforce_instance.txt']
+special_files = ['output.csv', 'response.json']
+
+# delete the content in each token file 
+for filename in token_files:
+    open(filename, 'w').close()
+
+for filename in special_files:
+    open((ABS_PATH.format(f'Events/{filename}')), 'w').close()
+
+#parameters: file of text
+#description: verify if the file is empty
+#return: if the file is empty or not.
+def isEmpty(file):
+    return not bool(file.read())
+
 #parameters: 
-#description: the main page of tis project
+#description: the main page of this project, decided wich page render depends of the auths
 #return: render the page
 @app.route('/')
 def index():
+    #variables for know in wich service is auth
+    loggedSkyApi = False
+    loggedSalesforce = False
+    transferData = False
+    
+    #if is logged in salesforce, the variable its True 
+    with open('salesforce_token.txt', 'r') as f:
+        if(not(isEmpty(f))):
+            loggedSalesforce = True 
+
+    #if is logged in Sky Api, the variable its True
+    with open('altru_token.txt', 'r') as f:
+        if(not(isEmpty(f))):
+            loggedSkyApi = True
+
+    with open('altru_token.txt', 'r') as f:
+        if(not(isEmpty(f))):
+            loggedSkyApi = True
+    
+    for filename in special_files:
+        with open((ABS_PATH.format(f'Events/{filename}')), 'r') as f:
+            if(not(isEmpty(f))):
+                transferData = True
+ 
     # Render the index page
-    return render_template('index.html')
+    return render_template('index.html', loggedSkyApi = loggedSkyApi, loggedSalesforce = loggedSalesforce, transferData = transferData)
+
+
+@app.route('/transferData', methods=['GET'])
+def transferData():
+    adapter = Adapter((ABS_PATH.format('Events/output.csv')))
+    adapter.process_data()
+    return redirect('/')
+
 
 #parameters: 
 #description: obtain access tokens when authorizing in altru
 #return: render the page
 @app.route('/skyapi/callback')
-def get_altru_token():
+def getSkyApiToken():
     # Define the service and API
     service = 'altru'
     api = 'skyapi'
-
     # Parse the URL query
     query = urllib.parse.urlparse(request.url).query
     query_components = dict(qc.split("=") for qc in query.split("&") if "=" in qc)
@@ -86,19 +138,18 @@ def get_altru_token():
                 logger.error(f"Error writing to file: {e}")
         else:
             logger.warning(f"Token response error: {token_response.content}")
-
-    # Redirect to the index page
+    
+    # Return the answer
     return redirect('/')
 
 #parameters: 
 #description: obtain access tokens when authorizing in salesforce
 #return: render the page
 @app.route('/salesforce/callback')
-def get_salesforce_token():
+def getSalesforceToken():
     # Define the service and API
     service = 'salesforce'
     api = 'salesforce'
-
     # Parse the URL query
     query = urllib.parse.urlparse(request.url).query
     query_components = dict(qc.split("=") for qc in query.split("&") if "=" in qc)
@@ -106,7 +157,6 @@ def get_salesforce_token():
     # If the query contains a code, get the token
     if "code" in query_components:
         code = query_components["code"]
-        print(f"Authorization code received: {code}")
         access_token = query_components["code"]
         access_token = access_token.replace("%3D%3D", "==")
 
@@ -115,7 +165,7 @@ def get_salesforce_token():
             f.write(access_token)
 
         # Request an access token
-        token_url = "https://login.salesforce.com/services/oauth2/token"
+        token_url = "https://test.salesforce.com/services/oauth2/token"
         token_data = {
             "grant_type": "authorization_code",
             "code": access_token,
@@ -130,17 +180,23 @@ def get_salesforce_token():
         if token_response.status_code == 200:
             access_token = token_response.json()["access_token"]
             refresh_token = token_response.json()["refresh_token"]
+            instance = token_response.json()["instance_url"]
+            logger.info(instance)
             try:
                 with open(f'{service}_token.txt', 'w') as f:
                     f.write(access_token)
                 with open(f'{service}_refresh_token.txt', 'w') as f:
                     f.write(refresh_token)
+                with open(f'{service}_instance.txt', 'w') as f:
+                    f.write(instance)
             except Exception as e:
                 logger.error(f"Error writing to file: {e}")
         else:
             logger.warning(f"Token response error: {token_response.content}")
+    
+    #logger.info(ans)
 
-    # Redirect to the index page
+    # Return the answer
     return redirect('/')
 
 #parameters: service (others CRM)
@@ -156,6 +212,7 @@ def auth(service):
 
     # Redirect to the authorization URL
     return redirect(auth_url)
+
 
 #run the server in port 8000
 if __name__ == '__main__':
