@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Loader</title>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/index.css')}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    function startTransfer() {
+        $('#loading').show(); // Muestra la vista de carga
+
+        $.ajax({
+            url: '/transferData',
+            type: 'GET',
+            success: function(response) {
+                $('#loading').hide(); // Oculta la vista de carga cuando la transferencia de datos se haya completado
+                location.href = '/'; // Redirige al usuario a la página de inicio
+            },
+            error: function(error) {
+                console.log(error);
+                $('#loading').hide(); // Oculta la vista de carga si hay un error
+            }
+        });
+    }
+    </script>
 </head>
 <body>
     <div class="login-container">
@@ -22,7 +41,7 @@
                 <button class="altru-login Connected-button connected">Connected with Altru</button>
                 <button class="salesforce-login Connected-button connected">Connected with Salesforce</button>
             </div>
-            <button class="transfer-data-salesforce transfer-button" onClick = "location.href='/transferData'">Transfer Data to Salesforce</button>
+            <button class="transfer-data-salesforce transfer-button" onClick = "startTransfer()">Transfer Data to Salesforce</button>
         {% elif loggedSkyApi %}
             <div class="login-button-container">
                 <button class="app-button connected"> Connected with Sky API</button>
@@ -39,6 +58,10 @@
                 <button class="app-button" onclick="location.href='/auth/salesforce'"> Log in with Salesforce</button>
             </div>
         {% endif %}
+    </div>
+    <div id="loading" style="display: none;">
+        <h2>Transfiriendo datos a Salesforce...</h2>
+        <!-- Puedes personalizar la vista de carga como prefieras -->
     </div>
 </body>
 </html>
