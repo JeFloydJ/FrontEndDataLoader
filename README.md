@@ -20,7 +20,7 @@ esta correra en http://127.0.0.1:8000/.
 
 hasta el momento solo tiene:
 - página principal: funcional con autorización en salesforce y autorización en altru y sus test unitarios.
-- página para transferir data: funcional, solo transfiere contacts, no valida el caso en que se tengan varias direcciones o telefonos.
+- página para transferir data: funcional, solo transfiere accounts, valida el caso en que se tengan varias direcciones o telefonos.
 - página de data completa: Todo esto es solo visual.
 
 
