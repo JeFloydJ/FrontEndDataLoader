@@ -1,9 +1,11 @@
 # Import necessary modules
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, mock_open, MagicMock
 sys.path.insert(1, '../')
 from app import app
+from app import isEmpty
+from app import transferData
 
 #parameters: 
 #description: test server, the server should obtain tokens in altru and salesforce
@@ -14,6 +16,15 @@ class TestApp(unittest.TestCase):
         # Set up the test client
         self.app = app.test_client()
         app.config['TESTING'] = True
+
+    def test_isEmpty(self):
+        # test when the file is empty
+        with patch("builtins.open", mock_open(read_data="")) as mock_file:
+            self.assertTrue(isEmpty(mock_file.return_value))
+
+        # test the file when is not empty
+        with patch("builtins.open", mock_open(read_data="not empty")) as mock_file:
+            self.assertFalse(isEmpty(mock_file.return_value))
 
     #parameters: 
     #description: test server, the server should obtain tokens in altru 
@@ -37,13 +48,24 @@ class TestApp(unittest.TestCase):
     def test_get_salesforce_token(self, mock_post):
         # Simulate a response from the Salesforce API
         mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = {'access_token': 'access', 'refresh_token': 'refresh'}
+        mock_post.return_value.json.return_value = {
+            'access_token': 'access',
+            'refresh_token': 'refresh',
+            'instance_url': 'https://test.salesforce.com'
+        }
 
         # Simulate a GET request to the /salesforce/callback route with an authorization code
         response = self.app.get('/salesforce/callback?code=auth_code')
 
         # Verify that the function behaved as expected
         self.assertEqual(response.status_code, 302)  # The response should be a redirection
+        # Verify that the tokens and instance were written to files
+        with open('salesforce_token.txt', 'r') as f:
+            self.assertEqual(f.read(), 'access')
+        with open('salesforce_refresh_token.txt', 'r') as f:
+            self.assertEqual(f.read(), 'refresh')
+        with open('salesforce_instance.txt', 'r') as f:
+            self.assertEqual(f.read(), 'https://test.salesforce.com')
 
     #parameters: 
     #description: test server, the server should render the main page

@@ -479,7 +479,7 @@ class Adapter:
         self.salesforce_processors = [(report_name, SalesforceProcessor(report_name)) for report_name in report_names]
 
     #parameters: adapter class between sky api(GET) and salesforce(POST) 
-    #description: sent info to salesforce after data was processed
+    #description: sent info to salesforce after data was procceeed
     #return: sent information to salesforce
     def process_data(self):
         self.data_processor.process_data()
