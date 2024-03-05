@@ -8,6 +8,7 @@ from auth.authSalesforce import authSalesforce
 from Events.eventTransferDataOrganizations import Adapter
 import os
 
+#absolute path of files
 ABS_PATH = os.path.join("/Users/juanestebanfloyd/Documents/FrontendDataLoader/App", "{}")
 
 # Set up logging
@@ -45,12 +46,15 @@ token_urls = {
 
 # List of files with tokens
 token_files = ['altru_token.txt', 'altru_refresh_token.txt', 'salesforce_token.txt', 'salesforce_refresh_token.txt', 'salesforce_instance.txt']
+
+#List of reports and csv files
 special_files = ['Veevart Organization Addresses Report test_output.csv', 'Veevart Organization Addresses Report test_response.json', 'Veevart Organization Phones Report test_output.csv', 'Veevart Organization Phones Report test_response.json', 'Veevart Organizations Report test_output.csv', 'Veevart Organizations Report test_response.json']
 
 # delete the content in each token file 
 for filename in token_files:
     open(filename, 'w').close()
 
+#delete content in each csv and json file
 for filename in special_files:
     open((ABS_PATH.format(f'Events/{filename}')), 'w').close()
 
@@ -89,11 +93,22 @@ def index():
     return render_template('index.html', loggedSkyApi = loggedSkyApi, loggedSalesforce = loggedSalesforce, transferData = transferData)
 
 
+#parameters: 
+#description: get data in sky api, after transfer to salesforce
+#return: render the page of the complete data
 @app.route('/transferData', methods=['GET'])
 def transferData():
+
+    #list of reports name with data necessary
     report_names = ["Veevart Organizations Report test","Veevart Organization Addresses Report test", "Veevart Organization Phones Report test"]
+    
+    #class adapter between get in sky api and post salesforce
     adapter = Adapter(report_names)
+
+    #method to get and post data
     adapter.process_data()
+
+    #render main page
     return redirect('/')
 
 
