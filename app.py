@@ -45,7 +45,7 @@ token_urls = {
 
 # List of files with tokens
 token_files = ['altru_token.txt', 'altru_refresh_token.txt', 'salesforce_token.txt', 'salesforce_refresh_token.txt', 'salesforce_instance.txt']
-special_files = ['output.csv', 'response.json']
+special_files = ['Veevart Organization Addresses Report test_output.csv', 'Veevart Organization Addresses Report test_response.json', 'Veevart Organization Phones Report test_output.csv', 'Veevart Organization Phones Report test_response.json', 'Veevart Organizations Report test_output.csv', 'Veevart Organizations Report test_response.json']
 
 # delete the content in each token file 
 for filename in token_files:
@@ -91,7 +91,8 @@ def index():
 
 @app.route('/transferData', methods=['GET'])
 def transferData():
-    adapter = Adapter((ABS_PATH.format('Events/output.csv')))
+    report_names = ["Veevart Organizations Report test","Veevart Organization Addresses Report test", "Veevart Organization Phones Report test"]
+    adapter = Adapter(report_names)
     adapter.process_data()
     return redirect('/')
 
