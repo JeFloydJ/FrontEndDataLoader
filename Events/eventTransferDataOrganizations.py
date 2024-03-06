@@ -327,9 +327,6 @@ class SalesforceProcessor:
     #description: info necessary to make a request in salesforce and data for sent to salesforce
     #return: sent information to salesforce
     def __init__(self, report_name):
-        #parameters: report name of the information necessary for sent to salesforce
-        #description: necessary keys and info to sent
-        #return: sent information to salesforce
         self.client_id = '3MVG9zeKbAVObYjPODek1PYnJW15VxHyhGPUOe1vzfHcg89tL_3Xyj_DCZQql_RL4Gjdnmk7EpfFk4DGDulnz'
         self.client_secret = '6003041383007768349'  
         self.redirect_uri = "http://localhost:8000"
@@ -340,7 +337,7 @@ class SalesforceProcessor:
         self.phone_list = []
         self.phone_act_list = []
         self.address_act_list = []
-
+        
         #read token for make request in salesforce
         with open(ABS_PATH.format('salesforce_token.txt'), 'r') as f:
             self.access_token = f.read().strip()
@@ -351,8 +348,44 @@ class SalesforceProcessor:
 
         #instance without "https://"
         instance = instance.split('https://')[1]
+
+
         #necessary to make request in salesforce
         self.sf = Salesforce(instance=instance, session_id=self.access_token)
+
+    #parameters: 
+    #description: generate and write refresh token in sky api when the old token isn't works
+    #return: refresh token
+    def refresh_token(self):
+        #read refresh token
+        with open(ABS_PATH.format("salesforce_refresh_token.txt"), 'r') as f:
+            #obtain refrsh token
+            refresh_token = f.read().strip()
+            
+        token_data = {
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+            "client_id": self.client_id,
+            "client_secret": self.client_secret
+        }
+        #request to obtain new token
+        token_response = requests.post(self.token_url, data=token_data)
+        
+        if token_response.status_code == 200:
+            access_token = token_response.json()["access_token"]
+            refresh_token = token_response.json()["refresh_token"]
+            instance = token_response.json()["instance_url"]
+            #obtain new token
+            try:
+                with open(ABS_PATH.format('salesforce_token.txt')) as f:
+                    f.write(access_token)
+                with open(ABS_PATH.format('salesforce_refresh_token.txt'), 'w') as f:
+                    f.write(refresh_token)
+                with open(ABS_PATH.format('salesforce_instance.txt'), 'w') as f:
+                    f.write(instance)
+            except Exception as e:
+                print(f"Error writing to file: {e}")
+
 
     #parameters: row with information of organizations
     #description: sent organizations info to salesforce
@@ -454,18 +487,38 @@ class SalesforceProcessor:
                 elif 'Veevart Organization Phones Report' in self.report_name: 
                     self.handle_phone_report(row) #process phone info to sent
                     self.handler_update_phone_organization(row) #proccess to updated info to organizations
+        try:
+            #if the list are not empty 
+            if self.address_list:
+                    self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
+            #if the list are not empty 
+            if self.account_list:  
+                self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) # update info in account object
+            #if the list are not empty 
+            if self.phone_list:
+                self.sf.bulk.vnfp__Phone__c.insert(self.phone_list, batch_size = 'auto', use_serial = True) #sent information in address object
+            #if the list are not empty 
+            if self.phone_act_list:
+                self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
+            #if the list are not empty 
+            if self.address_act_list:
+                self.sf.bulk.Account.upsert(self.address_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update informacion in address object
+        
+        except requests.exceptions.RequestException as e:
+            self.refresh_token()
+            #read token for make request in salesforce
+            with open(ABS_PATH.format('salesforce_token.txt'), 'r') as f:
+                self.access_token = f.read().strip()
+            
+            #read instance of the salesforce 
+            with open(ABS_PATH.format('salesforce_instance.txt'), 'r') as f:
+                instance = f.read().strip()
 
-        #if the list are not empty 
-        if self.address_list:
-            self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
-        if self.account_list:  
-            self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) # update info in account object
-        if self.phone_list:
-            self.sf.bulk.vnfp__Phone__c.insert(self.phone_list, batch_size = 'auto', use_serial = True) #sent information in address object
-        if self.phone_act_list:
-            self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
-        if self.address_act_list:
-            self.sf.bulk.Account.upsert(self.address_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update informacion in address object
+            #instance without "https://"
+            instance = instance.split('https://')[1]
+            #necessary to make request in salesforce
+            self.sf = Salesforce(instance=instance, session_id=self.access_token)
+            self.process_csv
 
 #parameters: adapter class between sky api(GET) and salesforce(POST) 
 #description: sent info to salesforce
