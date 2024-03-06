@@ -361,7 +361,7 @@ class SalesforceProcessor:
         with open(ABS_PATH.format("salesforce_refresh_token.txt"), 'r') as f:
             #obtain refrsh token
             refresh_token = f.read().strip()
-            
+
         token_data = {
             "grant_type": "refresh_token",
             "refresh_token": refresh_token,
@@ -425,16 +425,15 @@ class SalesforceProcessor:
     #description: sent phone info to salesforce
     #return: add information in a list for sent
     def handle_phone_report(self, row):
-        #implementation external id
+        #implementation external ID
         lookup_id = row['Lookup ID']
-        
-        #info to sent
+        #info for sent to salesforce
         phone_info = {
-            'vnfp__number__c' : row['Phones\\Number'],
-            'vnfp__Do_not_call__c' : row['Phones\\Do not call'],
+            'vnfp__Type__c' : 'Phone',
+            'vnfp__value__c' : row['Phones\\Number'],
             'vnfp__Account__r': {'Auctifera__Implementation_External_ID__c': lookup_id}
         }
-        #add information in a list to sent
+        #add information in a list for sent
         self.phone_list.append(phone_info)
 
     #parameters: update organization with a primary phone
@@ -496,7 +495,7 @@ class SalesforceProcessor:
                 self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) # update info in account object
             #if the list are not empty 
             if self.phone_list:
-                self.sf.bulk.vnfp__Phone__c.insert(self.phone_list, batch_size = 'auto', use_serial = True) #sent information in address object
+                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True) #sent information in address object 
             #if the list are not empty 
             if self.phone_act_list:
                 self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
