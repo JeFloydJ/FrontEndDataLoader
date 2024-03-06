@@ -71,8 +71,8 @@ class TestDataProcessor(unittest.TestCase):
     @patch('builtins.open', new_callable=MagicMock)
     @patch('csv.reader', return_value=iter([["header1", "header2", "header3"], ["value1", "value2", "value3"]]))
     @patch('csv.writer', return_value=MagicMock())
-    def test_eliminar_columnas(self, mock_writer, mock_reader, mock_open):
-        self.processor.eliminar_columnas("csv_input", ["header2"], "csv_output")
+    def test_delete_columns(self, mock_writer, mock_reader, mock_open):
+        self.processor.delete_columns("csv_input", ["header2"], "csv_output")
 
         self.assertEqual(mock_open.call_count, 2)
         mock_reader.assert_called_once()
@@ -84,8 +84,8 @@ class TestDataProcessor(unittest.TestCase):
     @patch('builtins.open', new_callable=MagicMock)
     @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name", "Email Addresses\\Email address", "Web address"], ["name", "last_name", "email@example.com", "http://example.com"]]))
     @patch('csv.writer', return_value=MagicMock())
-    def test_modificar_csv_nombres(self, mock_writer, mock_reader, mock_open):
-        self.processor.modificar_csv_nombres("input_csv", "output_csv")
+    def test_modify_csv_names(self, mock_writer, mock_reader, mock_open):
+        self.processor.modify_csv_names("input_csv", "output_csv")
 
         mock_reader.assert_called_once()
         mock_writer.assert_called_once()
@@ -97,8 +97,8 @@ class TestDataProcessor(unittest.TestCase):
     @patch('builtins.open', new_callable=MagicMock)
     @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name", "Phones\\Number"], ["name", "last_name", "1234567890"]]))
     @patch('csv.writer', return_value=MagicMock())
-    def test_modificar_csv_telefonos(self, mock_writer, mock_reader, mock_open):
-        self.processor.modificar_csv_telefonos("input_csv", "output_csv")
+    def test_modify_csv_phone(self, mock_writer, mock_reader, mock_open):
+        self.processor.modify_csv_phone("input_csv", "output_csv")
 
         mock_reader.assert_called_once()
         mock_writer.assert_called_once()
@@ -110,18 +110,18 @@ class TestDataProcessor(unittest.TestCase):
     @patch.object(DataProcessor, 'get_id')
     @patch.object(DataProcessor, 'get_query')
     @patch.object(DataProcessor, 'json_to_csv')
-    @patch.object(DataProcessor, 'eliminar_columnas')
-    @patch.object(DataProcessor, 'modificar_csv_nombres')
-    @patch.object(DataProcessor, 'modificar_csv_telefonos')
+    @patch.object(DataProcessor, 'delete_columns')
+    @patch.object(DataProcessor, 'modify_csv_names')
+    @patch.object(DataProcessor, 'modify_csv_phone')
     @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name", "Addresses\\Address", "Addresses\\ZIP"], ["name", "last_name", "address", "zip"]]))
-    def test_process_data(self, mock_reader, mock_modificar_csv_telefonos, mock_modificar_csv_nombres, mock_eliminar_columnas, mock_json_to_csv, mock_get_query, mock_get_id):
+    def test_process_data(self, mock_reader, mock_modify_csv_phone, mock_modify_csv_names, mock_delete_columns, mock_json_to_csv, mock_get_query, mock_get_id):
         self.processor.process_data()
         mock_get_id.assert_called()
         mock_get_query.assert_called()
         mock_json_to_csv.assert_called()
-        mock_eliminar_columnas.assert_called()
-        mock_modificar_csv_nombres.assert_called()
-        mock_modificar_csv_telefonos.assert_called()
+        mock_delete_columns.assert_called()
+        mock_modify_csv_names.assert_called()
+        mock_modify_csv_phone.assert_called()
 
 
 if __name__ == '__main__':

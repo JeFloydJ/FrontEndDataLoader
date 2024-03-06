@@ -153,7 +153,7 @@ class DataProcessor:
     #parameters: csv file, header to want delete, csv without headers
     #description: delete header in a csv
     #return: csv without headers 
-    def eliminar_columnas(self, csv_input, headers_eliminar, csv_output):
+    def delete_columns(self, csv_input, headers_eliminar, csv_output):
         # Leer el archivo CSV
         with open(csv_input, 'r') as f:
             rows = list(csv.reader(f))
@@ -174,7 +174,7 @@ class DataProcessor:
     #parameters: input csv for change information, csv with changed information
     #description: change personal information in csv file
     #return: csv file with changed information
-    def modificar_csv_nombres(self, input_csv, output_csv):
+    def modify_csv_names(self, input_csv, output_csv):
         with open(input_csv, 'r') as f:
             reader = csv.reader(f)
             #headers
@@ -220,7 +220,7 @@ class DataProcessor:
     #parameters: input csv for change information, csv with changed information
     #description: change personal information in csv file
     #return: csv file with changed information
-    def modificar_csv_direcciones(self, input_csv, output_csv):
+    def modify_csv_address(self, input_csv, output_csv):
         with open(input_csv, 'r') as f:
             reader = csv.reader(f)
             #headers
@@ -265,7 +265,7 @@ class DataProcessor:
     #parameters: input csv for change information, csv with changed information
     #description: change personal information in csv file
     #return: csv file with changed information
-    def modificar_csv_telefonos(self, input_csv, output_csv):
+    def modify_csv_phone(self, input_csv, output_csv):
         with open(input_csv, 'r') as f:
             reader = csv.reader(f)
             #header
@@ -282,7 +282,7 @@ class DataProcessor:
                 if row[name_index]:
                     row[name_index] = row[name_index][:5]
 
-                # Dejar solo la primera palabra en la columna de apellido y agregar 'x' al principio y al final only store the fist word of the name and add "x" in start position and last position
+                #only store the fist word of the name and add "x" in start position and last position
                 if row[last_name_index]:
                     first_word = row[last_name_index].split()[0]
                     row[last_name_index] = 'x' + first_word + 'x'
@@ -311,13 +311,13 @@ class DataProcessor:
             self.get_query(id_value, report_name) #info of the report by id
             self.json_to_csv(ABS_PATH.format(f'Events/{report_name}_response.json'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #convert json files to csv files
             headers_eliminar = ["QUERYRECID"] #delete this header in all csv files
-            self.eliminar_columnas(ABS_PATH.format(f'Events/{report_name}_output.csv'), headers_eliminar, ABS_PATH.format(f'Events/{report_name}_output.csv')) #delete header of this csv file
+            self.delete_columns(ABS_PATH.format(f'Events/{report_name}_output.csv'), headers_eliminar, ABS_PATH.format(f'Events/{report_name}_output.csv')) #delete header of this csv file
             if report_name == "Veevart Organizations Report test":
-                self.modificar_csv_nombres(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
+                self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
             elif report_name == "Veevart Organization Addresses Report test":
-                self.modificar_csv_direcciones(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
+                self.modify_csv_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
             elif report_name == "Veevart Organization Phones Report test":
-                self.modificar_csv_telefonos(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
+                self.modify_csv_phone(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
 
 #parameters: 
 #description: sent information of the csv file to salesforce 
