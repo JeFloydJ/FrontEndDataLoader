@@ -5,6 +5,11 @@ para instalar corra el siguiente comando en terminal:
 ```bash
 pip install Flask
 ```
+- requests:
+para instalar corra el siguiente comando en terminal:
+```bash
+pip install requets
+```
 - simple-salesforce:
 para instalar corra el siguiente comando en terminal:
 ```bash
@@ -14,7 +19,7 @@ pip install simple-salesforce
 - python-dotenv:
 para instalar corra el siguiente comando en terminal:
 ```bash
-pip pip install python-dotenv
+pip install python-dotenv
 ```
 
 Para correr este proyecto asegurese de estar en la carpeta principal del proyecto.
