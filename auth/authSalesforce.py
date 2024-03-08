@@ -1,5 +1,7 @@
 # Import necessary modules
 import requests
+from dotenv import load_dotenv
+import os
 
 #parameters: 
 #description: this function, make a request for solicit the tokens in altru service
@@ -7,9 +9,9 @@ import requests
 def authSalesforce():
 
     # Your Salesforce credentials
-    client_id = '3MVG9zeKbAVObYjPODek1PYnJW15VxHyhGPUOe1vzfHcg89tL_3Xyj_DCZQql_RL4Gjdnmk7EpfFk4DGDulnz'
-    redirect_uri = 'http://localhost:8000/salesforce/callback'
-    response_type = 'code'
+    client_id = os.getenv("CLIENT_ID_SALESFORCE")
+    redirect_uri = os.getenv("REDIRECT_URI_SALESFORCE")
+    response_type = os.getenv("RESPONSE_TYPE_SALESFORCE")
 
     # Salesforce authentication URL
     url = f"https://test.salesforce.com/services/oauth2/authorize?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}"

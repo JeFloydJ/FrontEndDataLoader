@@ -4,8 +4,15 @@ import json
 import csv
 from simple_salesforce import Salesforce
 import os
+from dotenv import load_dotenv
 
-ABS_PATH = os.path.join("/Users/juanestebanfloyd/Documents/FrontendDataLoader/App", "{}")
+# Load environment variables
+load_dotenv()
+
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(current_dir)
+ABS_PATH = os.path.join(BASE_DIR, "{}")
 
 #parameters: 
 #description: get data in sky api, 
@@ -15,10 +22,10 @@ class DataProcessor:
     #description: necessary keys for request to sky api
     #return: response to request
     def __init__(self):
-        self.client_id = "14ff689a-1054-43ef-a3ec-e3137c3c4a3e"
-        self.client_secret = "Y/YJK4+22KtLQt4CTkA3cwVtOXh7B+jpCUQolXYdLfo="
+        self.client_id = os.getenv("CLIENT_ID_SKY_API")
+        self.client_secret = os.getenv("CLIENT_SECRET_SKY_API")
         self.token_url = "https://oauth2.sky.blackbaud.com/token"
-        self.subscription_key = 'fa43a7b522a54b718178a4af6727392f'
+        self.subscription_key = os.getenv("SUBSCRIPTION_KEY_SKY_API")
         ssl._create_default_https_context = ssl._create_stdlib_context
 
     #parameters: 
@@ -327,9 +334,9 @@ class SalesforceProcessor:
     #description: info necessary to make a request in salesforce and data for sent to salesforce
     #return: sent information to salesforce
     def __init__(self, report_name):
-        self.client_id = '3MVG9zeKbAVObYjPODek1PYnJW15VxHyhGPUOe1vzfHcg89tL_3Xyj_DCZQql_RL4Gjdnmk7EpfFk4DGDulnz'
-        self.client_secret = '6003041383007768349'  
-        self.redirect_uri = "http://localhost:8000"
+        self.client_id = os.getenv("CLIENT_ID_SALESFORCE")
+        self.client_secret = os.getenv("CLIENT_SECRET_SALESFORCE")
+        self.redirect_uri = os.getenv("REDIRECT_URI_SALESFORCE")
         self.token_url = "https://test.salesforce.com/services/oauth2/token"
         self.report_name = report_name
         self.address_list = []

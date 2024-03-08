@@ -3,13 +3,19 @@ from flask import Flask, request, render_template, redirect
 import logging
 import requests
 import urllib.parse
+from dotenv import load_dotenv
 from auth.authAltru import authAltru
 from auth.authSalesforce import authSalesforce
 from Events.eventTransferDataOrganizations import Adapter
 import os
 
+# Load environment variables
+load_dotenv()
+
 #absolute path of files
-ABS_PATH = os.path.join("/Users/juanestebanfloyd/Documents/FrontendDataLoader/App", "{}")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(current_dir)
+ABS_PATH = os.path.join(BASE_DIR, "App", "{}")
 
 # Set up logging
 logging.basicConfig(level=logging.INFO,
@@ -22,20 +28,20 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Define client IDs
 client_ids = {
-    'salesforce': '3MVG9zeKbAVObYjPODek1PYnJW15VxHyhGPUOe1vzfHcg89tL_3Xyj_DCZQql_RL4Gjdnmk7EpfFk4DGDulnz',
-    'altru': '14ff689a-1054-43ef-a3ec-e3137c3c4a3e'
+    'salesforce': os.getenv("CLIENT_ID_SALESFORCE"),
+    'altru': os.getenv("CLIENT_ID_SKY_API")
 }
 
 # Define client secrets
 client_secrets = {
-    'salesforce': '6003041383007768349',
-    'altru': 'Y/YJK4+22KtLQt4CTkA3cwVtOXh7B+jpCUQolXYdLfo='
+    'salesforce': os.getenv("CLIENT_SECRET_SALESFORCE"),
+    'altru': os.getenv("CLIENT_SECRET_SKY_API")
 }
 
 # Define redirect URIs
 redirect_uris = {
-    'skyapi': "http://localhost:8000/skyapi/callback",
-    'salesforce': "http://localhost:8000/salesforce/callback"
+    'skyapi': os.getenv("REDIRECT_URI_SKY_API"),
+    'salesforce': os.getenv("REDIRECT_URI_SALESFORCE")
 }
 
 # Define token URLs
