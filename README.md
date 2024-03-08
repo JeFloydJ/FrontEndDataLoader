@@ -1,38 +1,33 @@
-## FrontEndDataLoader
-Dependencias del proyecto:
-- Flaks
-para instalar corra el siguiente comando en terminal:
+## MigrationTool
+
+## Dependencias del proyecto
+
+para descargar todas las dependencias necesarias sobre la carpeta `MIGRATIONTOOL` debe correr el siguiente comando:
+
 ```bash
-pip install Flask
-```
-- requests:
-para instalar corra el siguiente comando en terminal:
-```bash
-pip install requets
-```
-- simple-salesforce:
-para instalar corra el siguiente comando en terminal:
-```bash
-pip install simple-salesforce
+pip install -r requirements.txt
 ```
 
-- python-dotenv:
-para instalar corra el siguiente comando en terminal:
-```bash
-pip install python-dotenv
-```
-
-Para correr este proyecto asegurese de estar en la carpeta principal del proyecto.
+Para correr este proyecto asegurese de estar en la carpeta `App` del proyecto.
 para correr el proyecto ejecute en la terminal:
 
 ```bash
 python3 app.py
 ```
+
 esta correra en http://127.0.0.1:8000/.
 
 hasta el momento solo tiene:
 - página principal: funcional con autorización en salesforce y autorización en altru y sus test unitarios.
-- página para transferir data: funcional, solo transfiere accounts, valida el caso en que se tengan varias direcciones o telefonos.
+
+- página de transferencia de data: esta pagina permite transferir Accounts, estos accounts pueden tener varios telefonos y varias direcciones. Los telefonos se guardan en un objeto llamado Legacy Data. Los test unitarios de la pagina de obtener la informacion de SKY API, la clase se llama DataProcessor.
+
 - página de data completa: Todo esto es solo visual.
+
+Para correr test unitarios, sobre la carpeta `test` ejecutas el siguiente comando, donde file, es alguno de los `.py` que hay sobre la carpeta de test :
+
+```bash
+python3 file
+```
 
 
