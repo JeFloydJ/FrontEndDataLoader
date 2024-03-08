@@ -5,7 +5,7 @@ para instalar corra el siguiente comando en terminal:
 ```bash
 pip install Flask
 ```
-- Flask:
+- simple-salesforce:
 para instalar corra el siguiente comando en terminal:
 ```bash
 pip install simple-salesforce
@@ -13,7 +13,16 @@ pip install simple-salesforce
 Para correr este proyecto asegurese de estar en la carpeta principal del proyecto.
 para correr el proyecto ejecute en la terminal:
 
+- python-dotenv:
+para instalar corra el siguiente comando en terminal:
 ```bash
+pip pip install python-dotenv
+```
+
+```bash
+
+
+
 python3 app.py
 ```
 esta correra en http://127.0.0.1:8000/.
