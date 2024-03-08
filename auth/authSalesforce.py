@@ -3,6 +3,10 @@ import requests
 from dotenv import load_dotenv
 import os
 
+# Load environment variables
+load_dotenv()
+
+
 #parameters: 
 #description: this function, make a request for solicit the tokens in altru service
 #return: url with token
