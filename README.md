@@ -1,6 +1,6 @@
 ## FrontEndDataLoader
 Dependencias del proyecto:
-- simple-salesforce:
+- Flaks
 para instalar corra el siguiente comando en terminal:
 ```bash
 pip install Flask
