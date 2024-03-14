@@ -16,7 +16,7 @@ class TestAuthSalesforce(unittest.TestCase):
         url = authSalesforce()
 
         # Verify that the URL is not empty and starts with "https://login.salesforce.com"
-        self.assertTrue(url.startswith("https://login.salesforce.com"))
+        self.assertTrue(url.startswith("https://test.salesforce.com"))
         self.assertNotEqual(url, "https://login.salesforce.com")  # Ensure it's not the home URL
 
 if __name__ == '__main__':

@@ -1,11 +1,16 @@
 import requests
+import logging
 import ssl
 import json
 import csv
 from simple_salesforce import Salesforce
 import os
 from dotenv import load_dotenv
-
+# Set up logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+                    force=True)
+logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
@@ -403,8 +408,8 @@ class SalesforceProcessor:
             'Auctifera__Implementation_External_ID__c': row['Lookup ID'],
             'Name': row['Name'],
             'Website': row['Web address'],
-            'vnfp__Do_not_Email__c' : row['Email Addresses\\Do not email'],
-            'vnfp__Email__c': row['Email Addresses\\Email address']
+            'Auctifera__Email__c': row['Email Addresses\\Email address'],
+            'vnfp__Do_not_Email__c' : False if row['Email Addresses\\Do not email'] == '' or row['Email Addresses\\Do not email'] == False else True
         }
         #add info in a list for sent
         self.account_list.append(account_info)  
@@ -484,22 +489,24 @@ class SalesforceProcessor:
     def process_csv(self):
         with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
             reader = csv.DictReader(f)
+            logger.info(self.report_name)
             for row in reader:
-                if 'Veevart Organization Addresses Report' in self.report_name:
+                if 'Veevart Organization Addresses Report test' == self.report_name:
                     self.handle_addresses_report(row) #proccess info in a address for sent 
                     self.handler_update_address_organization(row) #proccess updated info to organization
-                elif 'Veevart Organization Report' in self.report_name: 
+                elif 'Veevart Organizations Report test' == self.report_name:
                     self.handle_organizations_report(row) #process info to report of organization
-                elif 'Veevart Organization Phones Report' in self.report_name: 
+                elif 'Veevart Organization Phones Report test' == self.report_name: 
                     self.handle_phone_report(row) #process phone info to sent
                     self.handler_update_phone_organization(row) #proccess to updated info to organizations
         try:
             #if the list are not empty 
             if self.address_list:
-                    self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
-            #if the list are not empty 
-            if self.account_list:  
-                self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) # update info in account object
+                self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
+            #if the list are not empty
+            if self.account_list:
+                print(self.account_list)  
+                print(self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) # update info in account object
             #if the list are not empty 
             if self.phone_list:
                 self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True) #sent information in address object 

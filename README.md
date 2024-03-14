@@ -5,7 +5,8 @@
 para descargar todas las dependencias necesarias sobre la carpeta `MIGRATIONTOOL` debe correr el siguiente comando:
 
 ```bash
-pip install -r requirements.txt
+chmod +x app.sh
+./app.sh
 ```
 
 Para correr este proyecto asegurese de estar en la carpeta `App` del proyecto.
@@ -24,10 +25,11 @@ hasta el momento solo tiene:
 
 - página de data completa: Todo esto es solo visual.
 
-Para correr test unitarios, sobre la carpeta `test` ejecutas el siguiente comando, donde file, es alguno de los `.py` que hay sobre la carpeta de test :
+Para correr test unitarios, sobre la carpeta `test` ejecutas el siguiente comando:
 
 ```bash
-python3 file
+chmod +x test.sh
+./test.sh
 ```
 
 
