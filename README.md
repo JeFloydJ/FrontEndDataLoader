@@ -1,19 +1,12 @@
 ## MigrationTool
 
-## Dependencias del proyecto
+## Dependencias del proyecto y correr el proyecto
 
 para descargar todas las dependencias necesarias sobre la carpeta `MIGRATIONTOOL` debe correr el siguiente comando:
 
 ```bash
 chmod +x app.sh
 ./app.sh
-```
-
-Para correr este proyecto asegurese de estar en la carpeta `App` del proyecto.
-para correr el proyecto ejecute en la terminal:
-
-```bash
-python3 app.py
 ```
 
 esta correra en http://127.0.0.1:8000/.
@@ -25,6 +18,7 @@ hasta el momento solo tiene:
 
 - página de data completa: Todo esto es solo visual.
 
+## Test
 Para correr test unitarios, sobre la carpeta `MIGRATIONTOOL` ejecutas el siguiente comando:
 
 ```bash
