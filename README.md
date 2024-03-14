@@ -25,7 +25,7 @@ hasta el momento solo tiene:
 
 - página de data completa: Todo esto es solo visual.
 
-Para correr test unitarios, sobre la carpeta `test` ejecutas el siguiente comando:
+Para correr test unitarios, sobre la carpeta `MIGRATIONTOOL` ejecutas el siguiente comando:
 
 ```bash
 chmod +x test.sh
