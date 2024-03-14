@@ -1,8 +1,8 @@
-## MigrationTool
+## FrontEndDataLoader
 
 ## Dependencias del proyecto y correr el proyecto
 
-para descargar todas las dependencias necesarias sobre la carpeta `MIGRATIONTOOL` debe correr el siguiente comando:
+para descargar todas las dependencias necesarias sobre la carpeta `FrontEndDataLoader` debe correr el siguiente comando:
 
 ```bash
 chmod +x app.sh
@@ -19,7 +19,7 @@ hasta el momento solo tiene:
 - página de data completa: Todo esto es solo visual.
 
 ## Test
-Para correr test unitarios, sobre la carpeta `MIGRATIONTOOL` ejecutas el siguiente comando:
+Para correr test unitarios, sobre la carpeta `FrontEndDataLoader` ejecutas el siguiente comando:
 
 ```bash
 chmod +x test.sh
