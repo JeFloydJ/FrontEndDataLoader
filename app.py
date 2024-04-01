@@ -54,7 +54,7 @@ token_urls = {
 token_files = ['altru_token.txt', 'altru_refresh_token.txt', 'salesforce_token.txt', 'salesforce_refresh_token.txt', 'salesforce_instance.txt']
 
 #List of reports and csv files
-special_files = ['Veevart Organization Addresses Report test_output.csv', 'Veevart Organization Addresses Report test_response.json', 'Veevart Organization Phones Report test_output.csv', 'Veevart Organization Phones Report test_response.json', 'Veevart Organizations Report test_output.csv', 'Veevart Organizations Report test_response.json']
+special_files = ['Veevart Organization Addresses Report test_output.csv', 'Veevart Organization Addresses Report test_response.json', 'Veevart Organization Phones Report test_output.csv', 'Veevart Organization Phones Report test_response.json', 'Veevart Organizations Report test_output.csv', 'Veevart Organizations Report test_response.json', 'Veevart HouseHolds Report test_response.json', 'Veevart HouseHolds Report test_output.csv', 'Veevart Contacts Report test_response.json', 'Veevart Contacts Report test_output.csv', 'Veevart Contacts Report Phones test_response.json', 'Veevart Contacts Report Phones test_output.csv', 'Veevart Contacts Report Email test_response.json', 'Veevart Contacts Report Email test_output.csv', 'Veevart Contacts Report Address test_response.json', 'Veevart Contacts Report Address test_output.csv']
 
 # delete the content in each token file 
 for filename in token_files:
@@ -106,7 +106,7 @@ def index():
 def transferData():
 
     #list of reports name with data necessary
-    report_names = ["Veevart Organizations Report test","Veevart Organization Addresses Report test", "Veevart Organization Phones Report test"]
+    report_names = ["Veevart Organizations Report test","Veevart Organization Addresses Report test", "Veevart Organization Phones Report test", "Veevart HouseHolds Report test", "Veevart Contacts Report test", "Veevart Contacts Report Address test", "Veevart Contacts Report Email test", "Veevart Contacts Report Email test", "Veevart Contacts Report Phones test"]
     
     #class adapter between get in sky api and post salesforce
     adapter = Adapter(report_names)

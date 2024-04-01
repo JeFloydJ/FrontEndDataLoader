@@ -6,11 +6,13 @@ import csv
 from simple_salesforce import Salesforce
 import os
 from dotenv import load_dotenv
+
 # Set up logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
                     force=True)
 logger = logging.getLogger(__name__)
+
 # Load environment variables
 load_dotenv()
 
@@ -161,7 +163,27 @@ class DataProcessor:
             #write rows of with necessary data
             for row in data['rows']:
                 writer.writerow(row)
-                
+
+    #parameters: input csv for change information, csv with changed information
+    #description: change personal information in csv file
+    #return: csv file with changed information
+    def modify_csv_households(self, input_csv, output_csv):
+            with open(input_csv, 'r') as f:
+                reader = csv.reader(f)
+                headers = next(reader)
+                data = list(reader)
+                name_index = headers.index('Name')
+
+                for row in data:
+                    # Dejar solo la primera letra en la columna de nombre
+                    if row[name_index]:
+                        row[name_index] = row[name_index][:5]
+
+                with open(output_csv, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(headers)
+                    writer.writerows(data)
+
     #parameters: csv file, header to want delete, csv without headers
     #description: delete header in a csv
     #return: csv without headers 
@@ -172,13 +194,10 @@ class DataProcessor:
         
         headers = rows[0]
         
-        #find index of the columns to delete
         indices_eliminar = [headers.index(header) for header in headers_eliminar if header in headers]
         
-        #delete of the columns
         rows = [[value for i, value in enumerate(row) if i not in indices_eliminar] for row in rows]
         
-        #load rows in the new csv file
         with open(csv_output, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerows(rows)
@@ -203,27 +222,22 @@ class DataProcessor:
             last_name_index = headers.index('Last/Organization/Group/Household name')
 
             for row in data:
-                # only store five characters in a name 
                 if row[name_index]:
                     row[name_index] = row[name_index][:5]
 
-                # only store firt word of the column last name and add "x" in the start and last position in the string
                 if row[last_name_index]:
                     first_word = row[last_name_index].split()[0]
                     row[last_name_index] = 'x' + first_word + 'x'
 
-                #only store the word "website.com"
                 if row[web_address_index]:
                     protocol, rest = row[web_address_index].split('//')
                     domain, path = rest.split('.com', 1)
                     row[web_address_index] = protocol + '//website.com' + path
 
-                #add "@tmail.comx" after of the @ in the email column
                 if '@' in row[email_index]:
                     local, domain = row[email_index].split('@')
                     row[email_index] = local + '@tmail.comx'
             
-            #apply changes in csv file
             with open(output_csv, 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(headers)
@@ -245,30 +259,23 @@ class DataProcessor:
             last_name_index = headers.index('Last/Organization/Group/Household name')
 
             for row in data:
-                #only store five characters of the name string
                 if row[name_index]:
                     row[name_index] = row[name_index][:5]
 
-                #only store first word of the column and add "x" in the start and the last position of the string
                 if row[last_name_index]:
                     first_word = row[last_name_index].split()[0]
                     row[last_name_index] = 'x' + first_word + 'x'
 
-            #addres index
             address_index = headers.index('Addresses\\Address')
-            #zip index
             zip_index = headers.index('Addresses\\ZIP')
 
             for row in data:
-                #only store the first worh of the first space
                 if row[address_index]:
                     row[address_index] = row[address_index].split()[0]
 
-                #only store the 2 characters in the zip code column
                 if row[zip_index]:
                     row[zip_index] = row[zip_index][:2]
 
-            #store new information in csv           
             with open(output_csv, 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(headers)
@@ -280,34 +287,141 @@ class DataProcessor:
     def modify_csv_phone(self, input_csv, output_csv):
         with open(input_csv, 'r') as f:
             reader = csv.reader(f)
-            #header
             headers = next(reader)
-            #data
             data = list(reader)
-            #index of name
             name_index = headers.index('Name')
-            #index of last_name
             last_name_index = headers.index('Last/Organization/Group/Household name')
 
             for row in data:
-                #only store the 5 characters of the name
                 if row[name_index]:
                     row[name_index] = row[name_index][:5]
 
-                #only store the fist word of the name and add "x" in start position and last position
                 if row[last_name_index]:
                     first_word = row[last_name_index].split()[0]
                     row[last_name_index] = 'x' + first_word + 'x'
 
-            #index of the phone 
             phone_index = headers.index('Phones\\Number')
 
             for row in data:
-                #only add the 5 five characters in a phone string
                 if row[phone_index]:
                     row[phone_index] = row[phone_index][:5]
 
-            #store new infomration in csv file
+            with open(output_csv, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(headers)
+                writer.writerows(data)
+
+    #parameters: input csv for change information, csv with changed information
+    #description: change personal information in csv file
+    #return: csv file with changed information
+    def modify_csv_contacs_address(self, input_csv, output_csv):
+            with open(input_csv, 'r') as f:
+                reader = csv.reader(f)
+                headers = next(reader)
+                data = list(reader)
+                name_index = headers.index('Name')
+                last_name_index = headers.index('Last/Organization/Group/Household name')
+                
+                address_index = headers.index('Addresses\\Address')
+                zip_index = headers.index('Addresses\\ZIP')
+
+                for row in data:
+       
+                    if row[address_index]:
+                        row[address_index] = row[address_index].split()[0]
+
+                    if row[zip_index]:
+                        row[zip_index] = row[zip_index][:2]
+
+                    if row[name_index]:
+                        row[name_index] = row[name_index][:5]
+
+                    if row[last_name_index]:
+                        first_word = row[last_name_index].split()[0]
+                        row[last_name_index] = 'x' + first_word + 'x'
+
+                with open(output_csv, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(headers)
+                    writer.writerows(data)
+
+    #parameters: input csv for change information, csv with changed information
+    #description: change personal information in csv file
+    #return: csv file with changed information
+    def modify_csv_contacs_email(self, input_csv, output_csv):
+            with open(input_csv, 'r') as f:
+                reader = csv.reader(f)
+                headers = next(reader)
+                data = list(reader)
+                name_index = headers.index('Name')
+                last_name_index = headers.index('Last/Organization/Group/Household name')                
+                email_index = headers.index('Email Addresses\\Email address')
+
+                for row in data:
+                    if row[name_index]:
+                        row[name_index] = row[name_index][:5]
+
+                    if row[last_name_index]:
+                        first_word = row[last_name_index].split()[0]
+                        row[last_name_index] = 'x' + first_word + 'x'
+
+                    if '@' in row[email_index]:
+                        local, domain = row[email_index].split('@')
+                        row[email_index] = local + '@tmail.comx'
+
+                with open(output_csv, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(headers)
+                    writer.writerows(data)
+
+    #parameters: input csv for change information, csv with changed information
+    #description: change personal information in csv file
+    #return: csv file with changed information
+    def modify_csv_contacs(self, input_csv, output_csv):
+            with open(input_csv, 'r') as f:
+                reader = csv.reader(f)
+                headers = next(reader)
+                data = list(reader)
+                name_index = headers.index('Name')
+                last_name_index = headers.index('Last/Organization/Group/Household name') 
+
+                for row in data:
+                    if row[name_index]:
+                        row[name_index] = row[name_index][:5]
+
+                    if row[last_name_index]:
+                        first_word = row[last_name_index].split()[0]
+                        row[last_name_index] = 'x' + first_word + 'x'
+
+
+                with open(output_csv, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(headers)
+                    writer.writerows(data)
+
+    #parameters: input csv for change information, csv with changed information
+    #description: change personal information in csv file
+    #return: csv file with changed information
+    def modify_csv_phones(self, input_csv, output_csv):
+        with open(input_csv, 'r') as f:
+            reader = csv.reader(f)
+            headers = next(reader)
+            data = list(reader)
+            name_index = headers.index('Name')
+            last_name_index = headers.index('Last/Organization/Group/Household name')
+            phone_index = headers.index('Phones\\Number')
+
+            for row in data:
+                if row[name_index]:
+                    row[name_index] = row[name_index][:5]
+
+                if row[last_name_index]:
+                    first_word = row[last_name_index].split()[0]
+                    row[last_name_index] = 'x' + first_word + 'x'
+
+                if row[phone_index]:
+                    row[phone_index] = row[phone_index][:5]
+
             with open(output_csv, 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(headers)
@@ -317,19 +431,27 @@ class DataProcessor:
     #description: generate csv file of the reports in sky api with changed information
     #return: csv file with changed information of all reports
     def process_data(self):
-        report_names = ["Veevart Organizations Report test", "Veevart Organization Addresses Report test", "Veevart Organization Phones Report test"] #name of the reports in sky api
+        report_names = ["Veevart Organizations Report test", "Veevart Organization Addresses Report test", "Veevart Organization Phones Report test", "Veevart HouseHolds Report test", "Veevart Contacts Report test", "Veevart Contacts Report Address test", "Veevart Contacts Report Email test", "Veevart Contacts Report Email test", "Veevart Contacts Report Phones test"]
         for report_name in report_names:
-            id_value = self.get_id(report_name) #id of the report
-            self.get_query(id_value, report_name) #info of the report by id
-            self.json_to_csv(ABS_PATH.format(f'Events/{report_name}_response.json'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #convert json files to csv files
-            headers_eliminar = ["QUERYRECID"] #delete this header in all csv files
-            self.delete_columns(ABS_PATH.format(f'Events/{report_name}_output.csv'), headers_eliminar, ABS_PATH.format(f'Events/{report_name}_output.csv')) #delete header of this csv file
+            id_value = self.get_id(report_name)
+            self.get_query(id_value, report_name)
+            self.json_to_csv(ABS_PATH.format(f'Events/{report_name}_response.json'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
             if report_name == "Veevart Organizations Report test":
-                self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
+                self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
             elif report_name == "Veevart Organization Addresses Report test":
-                self.modify_csv_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
+                self.modify_csv_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
             elif report_name == "Veevart Organization Phones Report test":
-                self.modify_csv_phone(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv')) #changed information in this csv file
+                self.modify_csv_phone(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart HouseHolds Report test":
+                self.modify_csv_households(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report Address test":
+                self.modify_csv_contacs_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report Email test":
+                self.modify_csv_contacs_email(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report test":
+                self.modify_csv_contacs(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report Phones test":
+                self.modify_csv_phones(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
 
 #parameters: 
 #description: sent information of the csv file to salesforce 
@@ -349,6 +471,16 @@ class SalesforceProcessor:
         self.phone_list = []
         self.phone_act_list = []
         self.address_act_list = []
+        self.houseHolds_list = []
+        self.contacts_list = []
+        self.contacts_phones_list = []
+        self.contacts_emails_list = []
+        self.contacts_address_list = []
+        self.contacts_id_list = []
+        self.contacts_accounts_id = {}
+        self.contacts_act_phone = []
+        self.contacts_act_email = []
+
         
         #read token for make request in salesforce
         with open(ABS_PATH.format('salesforce_token.txt'), 'r') as f:
@@ -365,6 +497,36 @@ class SalesforceProcessor:
         #necessary to make request in salesforce
         self.sf = Salesforce(instance=instance, session_id=self.access_token)
 
+        self.organizations_id = self.get_organizations_id() #id of organizations
+        self.households_id = self.get_households_id() #id of households
+
+    #parameters: 
+    #description: get recordTypeId for households in org
+    #return: return Id of households
+    def get_households_id(self):
+        query = self.sf.query("SELECT Id FROM RecordType WHERE DeveloperName = 'HH_Account' AND IsActive = true")
+        Id = query['records'][0]['Id']
+        return Id
+
+    #parameters: 
+    #description: get recordTypeId for organizations in org
+    #return: return Id of organizations
+    def get_organizations_id(self):
+        query = self.sf.query("SELECT Id FROM RecordType WHERE DeveloperName = 'organization' AND IsActive = true")
+        Id = query['records'][0]['Id']
+        return Id
+
+    #parameters: 
+    #description: get AccountId for contacts in org
+    #return: return hash table like: {'Auctifera__Implementation_External_ID__c': 'AccountId'}
+    def get_account_id(self):
+        query = {}
+        ans = self.sf.query_all("SELECT Id, AccountId, Auctifera__Implementation_External_ID__c FROM Contact WHERE Auctifera__Implementation_External_ID__c != null")
+        print('query:', ans)
+        for record in ans['records']:
+            query[record['Auctifera__Implementation_External_ID__c']] = record['AccountId']
+        return query
+    
     #parameters: 
     #description: generate and write refresh token in sky api when the old token isn't works
     #return: refresh token
@@ -403,63 +565,52 @@ class SalesforceProcessor:
     #description: sent organizations info to salesforce
     #return: add information in a list for sent
     def handle_organizations_report(self, row):
-        #info for sent 
         account_info = {
+            'RecordTypeId': self.organizations_id,
             'Auctifera__Implementation_External_ID__c': row['Lookup ID'],
             'Name': row['Name'],
             'Website': row['Web address'],
-            'Auctifera__Email__c': row['Email Addresses\\Email address'],
-            'vnfp__Do_not_Email__c' : False if row['Email Addresses\\Do not email'] == '' or row['Email Addresses\\Do not email'] == False else True
+            'vnfp__Do_not_Email__c' : False if row['Email Addresses\\Do not email'] == '' or row['Email Addresses\\Do not email'] == False else True,
         }
-        #add info in a list for sent
         self.account_list.append(account_info)  
 
     #parameters: row with information of addresses
     #description: sent addresses info to salesforce
     #return: add information in a list for sent
     def handle_addresses_report(self, row):
-        #implementation external ID
         lookup_id = row['Lookup ID']
-        #information for sent
         addresses_info = {
             'npsp__MailingStreet__c': row['Addresses\\Address'],
             'npsp__MailingCity__c': row['Addresses\\City'],
             'npsp__MailingState__c': row['Addresses\\State'],
             'npsp__MailingPostalCode__c': row['Addresses\\ZIP'],
             'npsp__MailingCountry__c': row['Addresses\\Country'],
-            'npsp__Default_Address__c' : row['Addresses\\Address'],
+            #'npsp__Default_Address__c' : row['Addresses\\Address'],
             'npsp__Household_Account__r': {'Auctifera__Implementation_External_ID__c': lookup_id} # upsert
         }
-        #add information in list for sent
         self.address_list.append(addresses_info)
 
     #parameters: row with information of phone
     #description: sent phone info to salesforce
     #return: add information in a list for sent
     def handle_phone_report(self, row):
-        #implementation external ID
         lookup_id = row['Lookup ID']
-        #info for sent to salesforce
         phone_info = {
             'vnfp__Type__c' : 'Phone',
             'vnfp__value__c' : row['Phones\\Number'],
             'vnfp__Account__r': {'Auctifera__Implementation_External_ID__c': lookup_id}
         }
-        #add information in a list for sent
         self.phone_list.append(phone_info)
 
     #parameters: update organization with a primary phone
     #description: sent update info to phone  to salesforce
     #return: add information in a list for sent
     def handler_update_phone_organization(self, row):
-        #primary phone
         valid = row['Phones\\Primary phone number']
-        #info to update
         new_info = {
             'Auctifera__Implementation_External_ID__c': row['Lookup ID'], 
             'Phone' : row['Phones\\Number']
         }
-        #if chaeckbox is True, add in a list to update phone info to list 
         if(valid):
             self.phone_act_list.append(new_info)            
 
@@ -467,88 +618,230 @@ class SalesforceProcessor:
     #description: sent update information to addresses to salesforce
     #return: add update information in a list for sent
     def handler_update_address_organization(self, row):
-        #implementation external id
         valid = row['Addresses\\Primary address']
-        #info necessary to sent 
         new_info = {
             'Auctifera__Implementation_External_ID__c': row['Lookup ID'], 
-            #'npsp__Default_Address__c' : row['Addresses\\Address']
             'BillingStreet' : row['Addresses\\Address'],
             'BillingCity' : row['Addresses\\City'],
             'BillingState' : row['Addresses\\State'],
             'BillingPostalCode' : row['Addresses\\ZIP'] ,
             'BillingCountry' : row['Addresses\\Country'],
         }
-        #if the checkbox is True, add information to update in a organization 
         if(valid):
             self.address_act_list.append(new_info)            
 
+    #parameters: row with information of households
+    #description: sent households info to salesforce
+    #return: add information in a list for sent
+    def handler_households(self, row):
+        households_info = {
+            'RecordTypeId': self.households_id,
+            'Auctifera__Implementation_External_ID__c': row['QUERYRECID'],
+            'Name': row['Name']
+        }
+        self.houseHolds_list.append(households_info)
+
+    #parameters: row with information of contacts
+    #description: sent contacts info to salesforce
+    #return: add information in a list for sent
+    def handler_contacts(self, row):
+        account = row['Households Belonging To\\Household Record ID'] 
+        gender = '' if row['Gender'] == 'Unknown' else row['Gender'] 
+        primary_contact = False if row['Households Belonging To\\Is primary contact'] == '' or row['Households Belonging To\\Is primary contact'] == False else True
+        contacts_info = {
+            #'Salutation' : row['Title'],
+            'FirstName' : row['First name'],
+            'LastName' : row['Last/Organization/Group/Household name'],
+            'Auctifera__Implementation_External_ID__c' : row['Lookup ID'],
+            # 'Description' : row['Notes\\Notes']
+            #'GenderIdentity' : row['Gender']
+        }
+        if account != '':
+            contacts_info['Account'] = {'Auctifera__Implementation_External_ID__c': account}
+        self.contacts_list.append(contacts_info)
+
+    #parameters: row with phones information of the contacts
+    #description: sent contacts info to salesforce
+    #return: add information in a list for sent
+    def handle_contacts_phone_report(self, row):
+        lookup_id = row['Lookup ID']
+        phone_info = {
+            'vnfp__Type__c' : 'Phone',
+            'vnfp__value__c' : row['Phones\\Number'],
+            #'vnfp__Do_not_call__c' : row['Phones\\Do not call'],
+            'vnfp__Contact__r': {'Auctifera__Implementation_External_ID__c': lookup_id}
+        }
+        self.contacts_phones_list.append(phone_info)
+
+    #parameters: row with emails information of contacts
+    #description: sent contacts info to salesforce
+    #return: add information in a list for sent
+    def handle_contacts_emails_report(self, row):
+        lookup_id = row['Lookup ID']
+        email_info = {
+            'vnfp__Type__c' : 'Email',
+            'vnfp__value__c' : row['Email Addresses\\Email address'],
+            #'vnfp__Do_not_call__c' : row['Phones\\Do not call'],
+            'vnfp__Contact__r': {'Auctifera__Implementation_External_ID__c': lookup_id}
+        }
+        self.contacts_emails_list.append(email_info)
+
+    #parameters: row with information of addresses
+    #description: sent addresses info to salesforce
+    #return: add information in a list for sent
+    def handle_contacts_addresses_report(self, row, dic):
+        print(row)
+        lookup_id = row['Lookup ID']
+        addresses_info = {
+            'npsp__MailingStreet__c': row['Addresses\\Address'],
+            'npsp__MailingCity__c': row['Addresses\\City'],
+            'npsp__MailingState__c': row['Addresses\\State'],
+            'npsp__MailingPostalCode__c': row['Addresses\\ZIP'],
+            'npsp__MailingCountry__c': row['Addresses\\Country'],
+            'npsp__Household_Account__c': dic[lookup_id],
+            'npsp__Default_Address__c' : False if row['Addresses\\Primary address'] == '' or row['Addresses\\Primary address'] == False else True
+        }
+
+        self.contacts_address_list.append(addresses_info)
+
+    #parameters: update contact with a primary phone
+    #description: sent update info to phone  to salesforce
+    #return: add information in a list for sent
+    def handle_contacts_update_phone(self, row):
+        valid = False if row['Phones\\Primary phone number'] == '' or row['Phones\\Primary phone number'] == False else True
+        new_info = {
+            'Auctifera__Implementation_External_ID__c': row['Lookup ID'], 
+            'Phone' : row['Phones\\Number']
+        }
+        if(valid):
+            self.contacts_act_phone.append(new_info)       
+
+    #parameters: update contact with a primary email
+    #description: sent update info to phone  to salesforce
+    #return: add information in a list for sent
+    def handle_contacts_update_email(self, row):
+        valid = False if row['Email Addresses\\Primary email address'] == '' or row['Email Addresses\\Primary email address'] == False else True
+        new_info = {
+            'Auctifera__Implementation_External_ID__c': row['Lookup ID'], 
+            'Email' : row['Email Addresses\\Email address']
+        }
+        if(valid):
+            self.contacts_act_email.append(new_info)       
+   
     #parameters: 
-    #description: proccess information to sent and store data in a list
-    #return: add data in a list to sent
-    def process_csv(self):
+    #description: sent organizations information to salesforce
+    #return: sent data
+    def process_organizations(self):
         with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
             reader = csv.DictReader(f)
-            logger.info(self.report_name)
             for row in reader:
-                if 'Veevart Organization Addresses Report test' == self.report_name:
-                    self.handle_addresses_report(row) #proccess info in a address for sent 
-                    self.handler_update_address_organization(row) #proccess updated info to organization
-                elif 'Veevart Organizations Report test' == self.report_name:
-                    self.handle_organizations_report(row) #process info to report of organization
+                if 'Veevart Organizations Report test' == self.report_name: 
+                    self.handle_organizations_report(row)
                 elif 'Veevart Organization Phones Report test' == self.report_name: 
-                    self.handle_phone_report(row) #process phone info to sent
-                    self.handler_update_phone_organization(row) #proccess to updated info to organizations
-        try:
-            #if the list are not empty 
+                    self.handle_phone_report(row)
+                    self.handler_update_phone_organization(row)
+                elif 'Veevart Organization Addresses Report test' == self.report_name:
+                    self.handle_addresses_report(row)
+                    self.handler_update_address_organization(row)
+
+            if self.account_list:
+                self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)  # update info in account object
+            
+            if self.phone_list:
+                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True) #sent information in address object            
+            
             if self.address_list:
                 self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
-            #if the list are not empty
-            if self.account_list:
-                print(self.account_list)  
-                print(self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) # update info in account object
-            #if the list are not empty 
-            if self.phone_list:
-                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True) #sent information in address object 
-            #if the list are not empty 
+
             if self.phone_act_list:
                 self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
-            #if the list are not empty 
+            
             if self.address_act_list:
                 self.sf.bulk.Account.upsert(self.address_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update informacion in address object
-        
-        except requests.exceptions.RequestException as e:
-            self.refresh_token()
-            #read token for make request in salesforce
-            with open(ABS_PATH.format('salesforce_token.txt'), 'r') as f:
-                self.access_token = f.read().strip()
+
+    #parameters: 
+    #description: sent households information to salesforce
+    #return: sent data
+    def process_households(self):
+        with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if 'Veevart HouseHolds Report test' == self.report_name:
+                    self.handler_households(row)
             
-            #read instance of the salesforce 
-            with open(ABS_PATH.format('salesforce_instance.txt'), 'r') as f:
-                instance = f.read().strip()
+            if self.houseHolds_list:
+                self.sf.bulk.account.insert(self.houseHolds_list, batch_size='auto',use_serial=True) #sent information in account(household) object            
+    
+    #parameters: 
+    #description: sent contacts information to salesforce
+    #return: sent data
+    def process_contacts(self):
+        with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if 'Veevart Contacts Report test' == self.report_name:
+                    self.handler_contacts(row)
+                elif 'Veevart Contacts Report Phones test' == self.report_name:
+                    self.handle_contacts_phone_report(row)
+                    self.handle_contacts_update_phone(row)
+                elif 'Veevart Contacts Report Email test' == self.report_name:
+                    self.handle_contacts_emails_report(row)
+                    self.handle_contacts_update_email(row)
 
-            #instance without "https://"
-            instance = instance.split('https://')[1]
-            #necessary to make request in salesforce
-            self.sf = Salesforce(instance=instance, session_id=self.access_token)
-            self.process_csv
+            if(self.contacts_list):
+                results = self.sf.bulk.Contact.upsert(self.contacts_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in contact object
+                for result in results:
+                    if result['success']:
+                        self.contacts_id_list.append(result['id'])
+                
+                self.contacts_accounts_id = self.get_account_id()
 
-#parameters: adapter class between sky api(GET) and salesforce(POST) 
-#description: sent info to salesforce
-#return: sent information to salesforce
+
+            if(self.contacts_phones_list):
+                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_phones_list, batch_size='auto',use_serial=True) 
+            
+            if(self.contacts_emails_list):
+                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_emails_list, batch_size='auto',use_serial=True)
+            
+            if(self.contacts_act_phone):
+                self.sf.bulk.Contact.upsert(self.contacts_act_phone, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
+
+            if(self.contacts_act_email):
+                self.sf.bulk.Contact.upsert(self.contacts_act_email, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
+
+        return self.contacts_accounts_id
+
+    #parameters: 
+    #description: sent address of contacts information to salesforce
+    #return: sent data
+    def process_contact_address(self):
+        with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if 'Veevart Contacts Report Address test' == self.report_name:
+                    self.handle_contacts_addresses_report(row, self.contacts_accounts_id)
+
+            if self.contacts_address_list:
+                self.sf.bulk.npsp__Address__c.insert(self.contacts_address_list, batch_size='auto',use_serial=True) #sent information in address object
+
+dic_accounts = {}
+
 class Adapter:
-    #parameters: name of report for sent info 
-    #description: constructor for sent info to salesforce (GET and POST)
-    #return: sent information of report 
     def __init__(self, report_names):
         self.data_processor = DataProcessor()
-        self.salesforce_processors = [(report_name, SalesforceProcessor(report_name)) for report_name in report_names]
+        self.report_names = report_names
 
-    #parameters: adapter class between sky api(GET) and salesforce(POST) 
-    #description: sent info to salesforce after data was procceeed
-    #return: sent information to salesforce
     def process_data(self):
         self.data_processor.process_data()
-        for report_name, salesforce_processor in self.salesforce_processors:
-            salesforce_processor.process_csv()
+        dic_accounts = {}
+        for report_name in self.report_names:
+            processor = SalesforceProcessor(report_name)
+            processor.process_organizations()
+            processor.process_households()
+            dic = processor.process_contacts()
+            dic_accounts = {**dic_accounts, **dic}
+            processor.contacts_accounts_id = dic_accounts
+            processor.process_contact_address()
+
+
 
