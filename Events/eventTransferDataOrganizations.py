@@ -645,19 +645,20 @@ class SalesforceProcessor:
     #description: sent contacts info to salesforce
     #return: add information in a list for sent
     def handler_contacts(self, row):
+        #object with info to sent
         account = row['Households Belonging To\\Household Record ID'] 
-        gender = '' if row['Gender'] == 'Unknown' else row['Gender'] 
-        primary_contact = False if row['Households Belonging To\\Is primary contact'] == '' or row['Households Belonging To\\Is primary contact'] == False else True
         contacts_info = {
-            #'Salutation' : row['Title'],
+            'Salutation' : row['Title'],
             'FirstName' : row['First name'],
             'LastName' : row['Last/Organization/Group/Household name'],
             'Auctifera__Implementation_External_ID__c' : row['Lookup ID'],
-            # 'Description' : row['Notes\\Notes']
-            #'GenderIdentity' : row['Gender']
+            'Description' : row['Notes\\Notes'],
+            'GenderIdentity' : row['Gender'],
+            'Description' : row['Notes\\Notes']
         }
         if account != '':
             contacts_info['Account'] = {'Auctifera__Implementation_External_ID__c': account}
+
         self.contacts_list.append(contacts_info)
 
     #parameters: row with phones information of the contacts
@@ -690,7 +691,6 @@ class SalesforceProcessor:
     #description: sent addresses info to salesforce
     #return: add information in a list for sent
     def handle_contacts_addresses_report(self, row, dic):
-        print(row)
         lookup_id = row['Lookup ID']
         addresses_info = {
             'npsp__MailingStreet__c': row['Addresses\\Address'],
@@ -824,13 +824,23 @@ class SalesforceProcessor:
             if self.contacts_address_list:
                 self.sf.bulk.npsp__Address__c.insert(self.contacts_address_list, batch_size='auto',use_serial=True) #sent information in address object
 
+# hash table like: {'Auctifera__Implementation_External_ID__c': 'AccountId'} for sent address information
 dic_accounts = {}
 
+#parameters: 
+#description: adaoter between sky an salesforce for sent data
+#return: get data and sent data
 class Adapter:
+    #parameters: report_names
+    #description: Initializes the DataProcessor and report names
+    #return: 
     def __init__(self, report_names):
         self.data_processor = DataProcessor()
         self.report_names = report_names
 
+    #parameters: 
+    #description: Processes data using the DataProcessor and sends address of contacts information to Salesforce
+    #return: sent data
     def process_data(self):
         self.data_processor.process_data()
         dic_accounts = {}
