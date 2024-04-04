@@ -828,7 +828,7 @@ class SalesforceProcessor:
 dic_accounts = {}
 
 #parameters: 
-#description: adaoter between sky an salesforce for sent data
+#description: adapter between sky an salesforce for sent data
 #return: get data and sent data
 class Adapter:
     #parameters: report_names
