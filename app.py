@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from auth.authAltru import authAltru
 from auth.authSalesforce import authSalesforce
 from Events.eventTransferDataOrganizations import Adapter
+import subprocess
 import os
 
 # Load environment variables
@@ -70,6 +71,16 @@ for filename in special_files:
 def isEmpty(file):
     return not bool(file.read())
 
+@app.route('/Validator')
+def validateToken():
+    statusValidator = 404
+    try:
+        with open('finish.txt', 'r') as f:
+            statusValidator = 200
+    finally:
+        return {'status': statusValidator}
+
+
 #parameters: 
 #description: the main page of this project, decided wich page render depends of the auths
 #return: render the page
@@ -104,19 +115,10 @@ def index():
 #return: render the page of the complete data
 @app.route('/transferData', methods=['GET'])
 def transferData():
-
-    #list of reports name with data necessary
-    report_names = ["Veevart Organizations Report test","Veevart Organization Addresses Report test", "Veevart Organization Phones Report test", "Veevart HouseHolds Report test", "Veevart Contacts Report test", "Veevart Contacts Report Address test", "Veevart Contacts Report Email test", "Veevart Contacts Report Email test", "Veevart Contacts Report Phones test"]
-    
-    #class adapter between get in sky api and post salesforce
-    adapter = Adapter(report_names)
-
-    #method to get and post data
-    adapter.process_data()
-
+    # os.spawnl(os.P_NOWAIT, 'python3 transferProcess.py')
+    subprocess.Popen(['python3', 'transferProcess.py', '&'])
     #render main page
-    return redirect('/')
-
+    return {'status': 200}
 
 #parameters: 
 #description: obtain access tokens when authorizing in altru

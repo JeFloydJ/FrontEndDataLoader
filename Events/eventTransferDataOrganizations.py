@@ -8,9 +8,17 @@ import os
 from dotenv import load_dotenv
 
 # Set up logging
+# logging.basicConfig(level=logging.INFO,
+#                     format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+#                     force=True)
+
 logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-                    force=True)
+                     format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+                     force=True, 
+                     filename='out.txt.log',
+                     filemode='w')
+
+
 logger = logging.getLogger(__name__)
 
 # Load environment variables
@@ -183,24 +191,6 @@ class DataProcessor:
                     writer = csv.writer(f)
                     writer.writerow(headers)
                     writer.writerows(data)
-
-    #parameters: csv file, header to want delete, csv without headers
-    #description: delete header in a csv
-    #return: csv without headers 
-    def delete_columns(self, csv_input, headers_eliminar, csv_output):
-        # Leer el archivo CSV
-        with open(csv_input, 'r') as f:
-            rows = list(csv.reader(f))
-        
-        headers = rows[0]
-        
-        indices_eliminar = [headers.index(header) for header in headers_eliminar if header in headers]
-        
-        rows = [[value for i, value in enumerate(row) if i not in indices_eliminar] for row in rows]
-        
-        with open(csv_output, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows(rows)
 
     #parameters: input csv for change information, csv with changed information
     #description: change personal information in csv file
@@ -745,19 +735,19 @@ class SalesforceProcessor:
                     self.handler_update_address_organization(row)
 
             if self.account_list:
-                self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)  # update info in account object
+                logger.info(self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True))  # update info in account object
             
             if self.phone_list:
-                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True) #sent information in address object            
+                logger.info(self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True)) #sent information in address object            
             
             if self.address_list:
-                self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
+                logger.info(self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True)) #sent information in address object
 
             if self.phone_act_list:
-                self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
+                logger.info(self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update information in account object
             
             if self.address_act_list:
-                self.sf.bulk.Account.upsert(self.address_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update informacion in address object
+                logger.info(self.sf.bulk.Account.upsert(self.address_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update informacion in address object
 
     #parameters: 
     #description: sent households information to salesforce
@@ -770,7 +760,7 @@ class SalesforceProcessor:
                     self.handler_households(row)
             
             if self.houseHolds_list:
-                self.sf.bulk.account.insert(self.houseHolds_list, batch_size='auto',use_serial=True) #sent information in account(household) object            
+                logger.info(self.sf.bulk.account.insert(self.houseHolds_list, batch_size='auto',use_serial=True)) #sent information in account(household) object            
     
     #parameters: 
     #description: sent contacts information to salesforce
@@ -790,6 +780,7 @@ class SalesforceProcessor:
 
             if(self.contacts_list):
                 results = self.sf.bulk.Contact.upsert(self.contacts_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in contact object
+                logger.info(results)
                 for result in results:
                     if result['success']:
                         self.contacts_id_list.append(result['id'])
@@ -798,16 +789,16 @@ class SalesforceProcessor:
 
 
             if(self.contacts_phones_list):
-                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_phones_list, batch_size='auto',use_serial=True) 
+                logger.info(self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_phones_list, batch_size='auto',use_serial=True)) 
             
             if(self.contacts_emails_list):
-                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_emails_list, batch_size='auto',use_serial=True)
+                logger.info(self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_emails_list, batch_size='auto',use_serial=True))
             
             if(self.contacts_act_phone):
-                self.sf.bulk.Contact.upsert(self.contacts_act_phone, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
+                logger.info(self.sf.bulk.Contact.upsert(self.contacts_act_phone, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update information in account object
 
             if(self.contacts_act_email):
-                self.sf.bulk.Contact.upsert(self.contacts_act_email, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
+                logger.info(self.sf.bulk.Contact.upsert(self.contacts_act_email, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update information in account object
 
         return self.contacts_accounts_id
 
@@ -822,7 +813,7 @@ class SalesforceProcessor:
                     self.handle_contacts_addresses_report(row, self.contacts_accounts_id)
 
             if self.contacts_address_list:
-                self.sf.bulk.npsp__Address__c.insert(self.contacts_address_list, batch_size='auto',use_serial=True) #sent information in address object
+                logger.info(self.sf.bulk.npsp__Address__c.insert(self.contacts_address_list, batch_size='auto',use_serial=True)) #sent information in address object
 
 # hash table like: {'Auctifera__Implementation_External_ID__c': 'AccountId'} for sent address information
 dic_accounts = {}
