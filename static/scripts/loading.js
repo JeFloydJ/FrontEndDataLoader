@@ -1,47 +1,55 @@
+var retryCount = 0; // Contador de reintentos
+const maxRetries = 10; // Máximo número de reintentos
+const baseDelay = 5000; // Retraso inicial de 5 segundos
+
 function startTransfer() {
-    $('#loading').show(); //show view of loading
-    var progress = 0; // set progress in 0%
+    $('#loading').show(); // Muestra la vista de carga
+    var progress = 0; // Establece el progreso en 0%
     var interval = setInterval(function() {
-        progress += 1; //increment the progress in 5% for each interation
-        $('#progress').text(progress + '%'); //update text of the element of progress
+        progress += 1; // Incrementa el progreso en 1% por cada iteración
+        $('#progress').text(progress + '%'); // Actualiza el texto del elemento de progreso
 
-        // if the progress exceeds 100%, stop de interval
+        // if progress is greater than 100%
         if (progress >= 100) clearInterval(interval);
-    }, 2000); //update the progress for each 2 seconds
+    }, 5000); // Actualiza el progreso cada 2 segundos update foreach n time
 
-    $.ajax({
+    $.ajax({ //start polling
         url: '/transferData',
         type: 'GET',
         success: function(response) {
             console.log(response, interval)
             if (response.status == 200) {
-                setTimeout(pollServer, 5000);
+                setTimeout(function() { pollServer(interval); }, baseDelay);
             } 
         }
-        })  
+    });  
 }
 
 function pollServer(interval) {
-    console.log('starting pool...')
+    console.log('Iniciando polling...')
     $.ajax({
         url: '/Validator',
         type: 'GET',
         success: function(response) {
             console.log(response, interval)
             if (response.status == 200) {
-                clearInterval(interval); // stop  the interval when the trasnfer is complete
-                $('#loading').hide(); // hide the view of the loading
-                location.href = '/'; // redirect to main page
+                clearInterval(interval); // stop the interval when data transfer is finished
+                $('#loading').hide(); // hidden view of loading
+                location.href = '/'; //redirect main page
+                retryCount = 0; // set counter of retrys
             } else {
-                // If the transfer is not complete, poll the server again after a delay
-                setTimeout(pollServer, 5000);
+                // if transfer is not complete , send request to server
+                if (retryCount < maxRetries) {
+                    retryCount++;
+                    const delay = baseDelay * Math.pow(2, retryCount); //increment exponential retry
+                    setTimeout(function() { pollServer(interval); }, delay);
+                }
             }
         },
         error: function(error) {
-            clearInterval(interval); // stop the interval if there are some error
-            $('#loading').hide(); // hide de view of loading
-            alert('Error al transferir data'); // show the message error
+            clearInterval(interval); //interval if exists some error
+            $('#loading').hide(); // hidden view of loading
+            alert('Error al transferir data'); // message of error
         }
     });
 }
-
