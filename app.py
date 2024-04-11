@@ -185,7 +185,7 @@ def getSalesforceToken():
             f.write(access_token)
 
         # Request an access token
-        token_url = "https://test.salesforce.com/services/oauth2/token"
+        token_url = "https://login.salesforce.com/services/oauth2/token"
         token_data = {
             "grant_type": "authorization_code",
             "code": access_token,
