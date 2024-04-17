@@ -1,6 +1,6 @@
 var retryCount = 0; // Contador de reintentos
 const maxRetries = 10; // Máximo número de reintentos
-const baseDelay = 5000; // Retraso inicial de 5 segundos
+const baseDelay = 500; // Retraso inicial de 5 segundos
 
 function startTransfer() {
     $('#loading').show(); // Muestra la vista de carga
@@ -26,7 +26,6 @@ function startTransfer() {
 }
 
 function pollServer(interval) {
-    console.log('Iniciando polling...')
     $.ajax({
         url: '/Validator',
         type: 'GET',

@@ -3,6 +3,7 @@ import logging
 import ssl
 import json
 import csv
+import re
 from simple_salesforce import Salesforce
 import os
 from dotenv import load_dotenv
@@ -426,6 +427,7 @@ class DataProcessor:
             id_value = self.get_id(report_name)
             self.get_query(id_value, report_name)
             self.json_to_csv(ABS_PATH.format(f'Events/{report_name}_response.json'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            
             if report_name == "Veevart Organizations Report test":
                 self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
             elif report_name == "Veevart Organization Addresses Report test":
@@ -516,7 +518,20 @@ class SalesforceProcessor:
         for record in ans['records']:
             query[record['Auctifera__Implementation_External_ID__c']] = record['AccountId']
         return query
+
+    #Parameters:
+    #description: get househoulds id modify for avoid duplicates error
+    #return: return hashtable like {'1-households-code' : 'code'}
+    def find_households_id(self, lst):
+        dic = {}
+        for element in lst:
+            match = re.search(r'(\d+)-households-(.*)', element)
+            if match:
+                id = match.group(2)
+                dic[id] = element
+        return dic
     
+
     #parameters: 
     #description: generate and write refresh token in sky api when the old token isn't works
     #return: refresh token
@@ -567,7 +582,7 @@ class SalesforceProcessor:
     #parameters: row with information of addresses
     #description: sent addresses info to salesforce
     #return: add information in a list for sent
-    def handle_addresses_report(self, row):
+    def handle_addresses_report(self, row, counter):
         lookup_id = row['Lookup ID']
         addresses_info = {
             'npsp__MailingStreet__c': row['Addresses\\Address'],
@@ -575,7 +590,9 @@ class SalesforceProcessor:
             'npsp__MailingState__c': row['Addresses\\State'],
             'npsp__MailingPostalCode__c': row['Addresses\\ZIP'],
             'npsp__MailingCountry__c': row['Addresses\\Country'],
-            #'npsp__Default_Address__c' : row['Addresses\\Address'],
+            'npsp__Default_Address__c' : False if row['Addresses\\Primary address'] == '' or row['Addresses\\Primary address'] == False else True,
+            'vnfp__Implementation_External_ID__c' : str(str(counter)+ '-' + 'address'+ '-organization' + '-' + row['QUERYRECID']),
+            #'Implementation_External_ID__c' : str(str(counter)+ '-' + 'address'+ '-organization' + '-' + row['QUERYRECID']),
             'npsp__Household_Account__r': {'Auctifera__Implementation_External_ID__c': lookup_id} # upsert
         }
         self.address_list.append(addresses_info)
@@ -634,7 +651,10 @@ class SalesforceProcessor:
     #parameters: row with information of contacts
     #description: sent contacts info to salesforce
     #return: add information in a list for sent
-    def handler_contacts(self, row):
+    #parameters: row with information of contacts
+    #description: sent contacts info to salesforce
+    #return: add information in a list for sent
+    def handler_contacts(self, row, dic):
         #object with info to sent
         account = row['Households Belonging To\\Household Record ID'] 
         contacts_info = {
@@ -644,44 +664,49 @@ class SalesforceProcessor:
             'Auctifera__Implementation_External_ID__c' : row['Lookup ID'],
             'Description' : row['Notes\\Notes'],
             'GenderIdentity' : row['Gender'],
-            'Description' : row['Notes\\Notes']
         }
         if account != '':
-            contacts_info['Account'] = {'Auctifera__Implementation_External_ID__c': account}
+            contacts_info['Account'] = {'Auctifera__Implementation_External_ID__c': dic[account]}
 
         self.contacts_list.append(contacts_info)
 
     #parameters: row with phones information of the contacts
     #description: sent contacts info to salesforce
     #return: add information in a list for sent
-    def handle_contacts_phone_report(self, row):
+    def handle_contacts_phone_report(self, row, counter):
         lookup_id = row['Lookup ID']
         phone_info = {
             'vnfp__Type__c' : 'Phone',
             'vnfp__value__c' : row['Phones\\Number'],
             #'vnfp__Do_not_call__c' : row['Phones\\Do not call'],
-            'vnfp__Contact__r': {'Auctifera__Implementation_External_ID__c': lookup_id}
+            'vnfp__Contact__r': {'Auctifera__Implementation_External_ID__c': lookup_id},
+            'vnfp__Implementation_External_ID__c' : str(str(counter)+ '-' + 'phone' + '-' + row['QUERYRECID']),
+            #'Implementation_External_ID__c' : str(str(counter)+ '-' + 'phone' + '-' + row['QUERYRECID'])
         }
         self.contacts_phones_list.append(phone_info)
 
     #parameters: row with emails information of contacts
     #description: sent contacts info to salesforce
     #return: add information in a list for sent
-    def handle_contacts_emails_report(self, row):
+    def handle_contacts_emails_report(self, row, counter):
         lookup_id = row['Lookup ID']
         email_info = {
             'vnfp__Type__c' : 'Email',
             'vnfp__value__c' : row['Email Addresses\\Email address'],
             #'vnfp__Do_not_call__c' : row['Phones\\Do not call'],
-            'vnfp__Contact__r': {'Auctifera__Implementation_External_ID__c': lookup_id}
+            'vnfp__Contact__r': {'Auctifera__Implementation_External_ID__c': lookup_id},
+            'vnfp__Implementation_External_ID__c' : str(str(counter)+ '-' + 'contacts-email' + '-' + row['QUERYRECID'])
+            #'Implementation_External_ID__c' : str(str(counter)+ '-' + 'contacts-email' + '-' + row['QUERYRECID'])
+
         }
         self.contacts_emails_list.append(email_info)
 
-    #parameters: row with information of addresses
-    #description: sent addresses info to salesforce
+    #parameters: row with address information of contacts
+    #description: sent contacts info to salesforce
     #return: add information in a list for sent
-    def handle_contacts_addresses_report(self, row, dic):
+    def handle_contacts_addresses_report(self, row, dic, counter):
         lookup_id = row['Lookup ID']
+        # print('dic en address', dic)
         addresses_info = {
             'npsp__MailingStreet__c': row['Addresses\\Address'],
             'npsp__MailingCity__c': row['Addresses\\City'],
@@ -689,13 +714,15 @@ class SalesforceProcessor:
             'npsp__MailingPostalCode__c': row['Addresses\\ZIP'],
             'npsp__MailingCountry__c': row['Addresses\\Country'],
             'npsp__Household_Account__c': dic[lookup_id],
-            'npsp__Default_Address__c' : False if row['Addresses\\Primary address'] == '' or row['Addresses\\Primary address'] == False else True
+            'npsp__Default_Address__c' : False if row['Addresses\\Primary address'] == '' or row['Addresses\\Primary address'] == False else True,
+            'vnfp__Implementation_External_ID__c' : str(str(counter)+ '-' + 'contacts-address' + '-' + 'contacts' +row['QUERYRECID'])
+            #'Implementation_External_ID__c' : str(str(counter)+ '-' + 'contacts-address' + '-' + 'contacts' +row['QUERYRECID'])
         }
 
         self.contacts_address_list.append(addresses_info)
 
-    #parameters: update contact with a primary phone
-    #description: sent update info to phone  to salesforce
+    #parameters: row with phone information of contacts
+    #description: sent contacts info to salesforce
     #return: add information in a list for sent
     def handle_contacts_update_phone(self, row):
         valid = False if row['Phones\\Primary phone number'] == '' or row['Phones\\Primary phone number'] == False else True
@@ -704,10 +731,10 @@ class SalesforceProcessor:
             'Phone' : row['Phones\\Number']
         }
         if(valid):
-            self.contacts_act_phone.append(new_info)       
+            self.contacts_act_phone.append(new_info)
 
-    #parameters: update contact with a primary email
-    #description: sent update info to phone  to salesforce
+    #parameters: row with email information of contacts
+    #description: sent contacts info to salesforce
     #return: add information in a list for sent
     def handle_contacts_update_email(self, row):
         valid = False if row['Email Addresses\\Primary email address'] == '' or row['Email Addresses\\Primary email address'] == False else True
@@ -715,8 +742,10 @@ class SalesforceProcessor:
             'Auctifera__Implementation_External_ID__c': row['Lookup ID'], 
             'Email' : row['Email Addresses\\Email address']
         }
-        if(valid):
+        if valid and self.valid_check.get(row['Lookup ID'], None) == None:
             self.contacts_act_email.append(new_info)       
+            self.valid_check[row['Lookup ID']] = True
+      
    
     #parameters: 
     #description: sent organizations information to salesforce
@@ -735,70 +764,77 @@ class SalesforceProcessor:
                     self.handler_update_address_organization(row)
 
             if self.account_list:
-                logger.info(self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True))  # update info in account object
+                self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)  # update info in account object
             
             if self.phone_list:
-                logger.info(self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True)) #sent information in address object            
+                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True) #sent information in address object            
             
             if self.address_list:
-                logger.info(self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True)) #sent information in address object
+                self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
 
             if self.phone_act_list:
-                logger.info(self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update information in account object
+                self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
             
             if self.address_act_list:
-                logger.info(self.sf.bulk.Account.upsert(self.address_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update informacion in address object
+                self.sf.bulk.Account.upsert(self.address_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update informacion in address object
 
     #parameters: 
     #description: sent households information to salesforce
     #return: sent data
     def process_households(self):
+        counter = 0
         with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
+                counter += 1
                 if 'Veevart HouseHolds Report test' == self.report_name:
-                    self.handler_households(row)
-            
+                    self.handler_households(row, counter)
+                
             if self.houseHolds_list:
-                logger.info(self.sf.bulk.account.insert(self.houseHolds_list, batch_size='auto',use_serial=True)) #sent information in account(household) object            
+ #               self.sf.bulk.account.insert(self.houseHolds_list, batch_size='auto',use_serial=True) #sent information in account(household) object            
+                  self.sf.bulk.Account.upsert(self.houseHolds_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update informacion in address object
+        
+        return self.houseHolds_external_ids_list   
     
     #parameters: 
     #description: sent contacts information to salesforce
     #return: sent data
     def process_contacts(self):
+        counter = 0
         with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
+                counter += 1
                 if 'Veevart Contacts Report test' == self.report_name:
-                    self.handler_contacts(row)
+                    self.handler_contacts(row, self.households_ids)
                 elif 'Veevart Contacts Report Phones test' == self.report_name:
-                    self.handle_contacts_phone_report(row)
+                    self.handle_contacts_phone_report(row, counter)
                     self.handle_contacts_update_phone(row)
                 elif 'Veevart Contacts Report Email test' == self.report_name:
-                    self.handle_contacts_emails_report(row)
+                    self.handle_contacts_emails_report(row, counter)
                     self.handle_contacts_update_email(row)
-
-            if(self.contacts_list):
+                   
+             
+            if self.contacts_list:
                 results = self.sf.bulk.Contact.upsert(self.contacts_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in contact object
-                logger.info(results)
                 for result in results:
                     if result['success']:
                         self.contacts_id_list.append(result['id'])
                 
                 self.contacts_accounts_id = self.get_account_id()
 
-
-            if(self.contacts_phones_list):
-                logger.info(self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_phones_list, batch_size='auto',use_serial=True)) 
+            if self.contacts_phones_list:
+                self.sf.bulk.vnfp__Legacy_Data__c.upsert(self.contacts_phones_list, 'vnfp__Implementation_External_ID__c', batch_size='auto',use_serial=True) 
             
-            if(self.contacts_emails_list):
-                logger.info(self.sf.bulk.vnfp__Legacy_Data__c.insert(self.contacts_emails_list, batch_size='auto',use_serial=True))
+            if self.contacts_emails_list:
+                self.sf.bulk.vnfp__Legacy_Data__c.upsert(self.contacts_emails_list, 'vnfp__Implementation_External_ID__c', batch_size='auto',use_serial=True) 
             
-            if(self.contacts_act_phone):
-                logger.info(self.sf.bulk.Contact.upsert(self.contacts_act_phone, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update information in account object
-
-            if(self.contacts_act_email):
-                logger.info(self.sf.bulk.Contact.upsert(self.contacts_act_email, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)) #update information in account object
+            if self.contacts_act_phone:
+                self.sf.bulk.Contact.upsert(self.contacts_act_phone, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
+            
+            #print('update emails contacts', self.contacts_act_email)
+            if self.contacts_act_email:
+                self.sf.bulk.Contact.upsert(self.contacts_act_email, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
 
         return self.contacts_accounts_id
 
@@ -807,16 +843,22 @@ class SalesforceProcessor:
     #return: sent data
     def process_contact_address(self):
         with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
+            counter = 0
             reader = csv.DictReader(f)
             for row in reader:
+                counter += 1
                 if 'Veevart Contacts Report Address test' == self.report_name:
-                    self.handle_contacts_addresses_report(row, self.contacts_accounts_id)
+                    self.handle_contacts_addresses_report(row, self.contacts_accounts_id, counter)
 
+            # print('update address contacts', self.contacts_address_list)
             if self.contacts_address_list:
-                logger.info(self.sf.bulk.npsp__Address__c.insert(self.contacts_address_list, batch_size='auto',use_serial=True)) #sent information in address object
+                self.sf.bulk.npsp__Address__c.upsert(self.contacts_address_list, 'vnfp__Implementation_External_ID__c', batch_size='auto',use_serial=True)  #sent information in address object
+ #sent information in address object
 
 # hash table like: {'Auctifera__Implementation_External_ID__c': 'AccountId'} for sent address information
 dic_accounts = {}
+#hashtable like {'1-households-code' : 'code'}
+dic_households_ids = {}
 
 #parameters: 
 #description: adapter between sky an salesforce for sent data
@@ -839,9 +881,10 @@ class Adapter:
             processor = SalesforceProcessor(report_name)
             processor.process_organizations()
             processor.process_households()
+            dic_households_ids = {**dic_households_ids, **processor.process_households_ids()}
+            processor.households_ids = dic_households_ids
             dic = processor.process_contacts()
             dic_accounts = {**dic_accounts, **dic}
-            processor.contacts_accounts_id = dic_accounts
             processor.process_contact_address()
 
 
