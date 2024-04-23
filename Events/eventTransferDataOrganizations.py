@@ -428,22 +428,22 @@ class DataProcessor:
             self.get_query(id_value, report_name)
             self.json_to_csv(ABS_PATH.format(f'Events/{report_name}_response.json'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
             
-            if report_name == "Veevart Organizations Report test":
-                self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            elif report_name == "Veevart Organization Addresses Report test":
-                self.modify_csv_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            elif report_name == "Veevart Organization Phones Report test":
-                self.modify_csv_phone(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            elif report_name == "Veevart HouseHolds Report test":
-                self.modify_csv_households(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            elif report_name == "Veevart Contacts Report Address test":
-                self.modify_csv_contacs_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            elif report_name == "Veevart Contacts Report Email test":
-                self.modify_csv_contacs_email(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            elif report_name == "Veevart Contacts Report test":
-                self.modify_csv_contacs(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            elif report_name == "Veevart Contacts Report Phones test":
-                self.modify_csv_phones(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # if report_name == "Veevart Organizations Report test":
+            #     self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # elif report_name == "Veevart Organization Addresses Report test":
+            #     self.modify_csv_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # elif report_name == "Veevart Organization Phones Report test":
+            #     self.modify_csv_phone(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # elif report_name == "Veevart HouseHolds Report test":
+            #     self.modify_csv_households(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # elif report_name == "Veevart Contacts Report Address test":
+            #     self.modify_csv_contacs_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # elif report_name == "Veevart Contacts Report Email test":
+            #     self.modify_csv_contacs_email(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # elif report_name == "Veevart Contacts Report test":
+            #     self.modify_csv_contacs(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            # elif report_name == "Veevart Contacts Report Phones test":
+            #     self.modify_csv_phones(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
 
 #parameters: 
 #description: sent information of the csv file to salesforce 
@@ -472,6 +472,10 @@ class SalesforceProcessor:
         self.contacts_accounts_id = {}
         self.contacts_act_phone = []
         self.contacts_act_email = []
+        self.houseHolds_external_ids_list = []
+        self.households_ids = {}
+        self.valid_check = {}
+
 
         
         #read token for make request in salesforce
@@ -640,12 +644,15 @@ class SalesforceProcessor:
     #parameters: row with information of households
     #description: sent households info to salesforce
     #return: add information in a list for sent
-    def handler_households(self, row):
+    def handler_households(self, row, counter):
+        #object with info to sent
+        self.houseHolds_external_ids_list.append(str( str(counter) + '-' + 'households' +'-'+row['QUERYRECID'])) 
         households_info = {
             'RecordTypeId': self.households_id,
-            'Auctifera__Implementation_External_ID__c': row['QUERYRECID'],
+            'Auctifera__Implementation_External_ID__c': str( str(counter) + '-' + 'households' +'-'+row['QUERYRECID']),
             'Name': row['Name']
         }
+        #add info to list
         self.houseHolds_list.append(households_info)
 
     #parameters: row with information of contacts
@@ -751,6 +758,7 @@ class SalesforceProcessor:
     #description: sent organizations information to salesforce
     #return: sent data
     def process_organizations(self):
+        counter = 0
         with open(ABS_PATH.format(f'Events/{self.report_name}_output.csv'), 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -760,17 +768,17 @@ class SalesforceProcessor:
                     self.handle_phone_report(row)
                     self.handler_update_phone_organization(row)
                 elif 'Veevart Organization Addresses Report test' == self.report_name:
-                    self.handle_addresses_report(row)
+                    self.handle_addresses_report(row,counter)
                     self.handler_update_address_organization(row)
 
             if self.account_list:
                 self.sf.bulk.Account.upsert(self.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True)  # update info in account object
             
             if self.phone_list:
-                self.sf.bulk.vnfp__Legacy_Data__c.insert(self.phone_list, batch_size='auto',use_serial=True) #sent information in address object            
+                self.sf.bulk.vnfp__Legacy_Data__c.upsert(self.phone_list, 'vnfp__Implementation_External_ID__c', batch_size='auto',use_serial=True)            
             
             if self.address_list:
-                self.sf.bulk.npsp__Address__c.insert(self.address_list, batch_size='auto',use_serial=True) #sent information in address object
+                self.sf.bulk.npsp__Address__c.upsert(self.address_list, 'vnfp__Implementation_External_ID__c', batch_size='auto',use_serial=True)
 
             if self.phone_act_list:
                 self.sf.bulk.Account.upsert(self.phone_act_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update information in account object
@@ -795,6 +803,13 @@ class SalesforceProcessor:
                   self.sf.bulk.Account.upsert(self.houseHolds_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto',use_serial=True) #update informacion in address object
         
         return self.houseHolds_external_ids_list   
+    
+    #parameters: 
+    #description: sent households information to salesforce
+    #return: sent data
+    def process_households_ids(self):
+        self.households_ids = self.find_households_id(self.houseHolds_external_ids_list)
+        return self.households_ids
     
     #parameters: 
     #description: sent contacts information to salesforce
@@ -853,7 +868,7 @@ class SalesforceProcessor:
             # print('update address contacts', self.contacts_address_list)
             if self.contacts_address_list:
                 self.sf.bulk.npsp__Address__c.upsert(self.contacts_address_list, 'vnfp__Implementation_External_ID__c', batch_size='auto',use_serial=True)  #sent information in address object
- #sent information in address object
+
 
 # hash table like: {'Auctifera__Implementation_External_ID__c': 'AccountId'} for sent address information
 dic_accounts = {}
@@ -870,6 +885,7 @@ class Adapter:
     def __init__(self, report_names):
         self.data_processor = DataProcessor()
         self.report_names = report_names
+        self.dic_households_ids = {}
 
     #parameters: 
     #description: Processes data using the DataProcessor and sends address of contacts information to Salesforce
@@ -881,8 +897,9 @@ class Adapter:
             processor = SalesforceProcessor(report_name)
             processor.process_organizations()
             processor.process_households()
-            dic_households_ids = {**dic_households_ids, **processor.process_households_ids()}
-            processor.households_ids = dic_households_ids
+            logger.info(dic_households_ids)
+            self.dic_households_ids = {**self.dic_households_ids, **processor.process_households_ids()}
+            processor.households_ids = self.dic_households_ids
             dic = processor.process_contacts()
             dic_accounts = {**dic_accounts, **dic}
             processor.process_contact_address()
