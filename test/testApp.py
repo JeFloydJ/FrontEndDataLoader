@@ -25,6 +25,24 @@ class TestApp(unittest.TestCase):
         # test the file when is not empty
         with patch("builtins.open", mock_open(read_data="not empty")) as mock_file:
             self.assertFalse(isEmpty(mock_file.return_value))
+    
+    @patch('subprocess.Popen')
+    def test_transferData(self, mock_popen):
+        # Simulate a GET request to the /transferData route
+        response = self.app.get('/transferData')
+
+        # Verify that the function behaved as expected
+        self.assertEqual(response.status_code, 200)  # The response should be 200 OK
+        mock_popen.assert_called_once_with(['python3', 'transferProcess.py', '&'])
+
+
+    @patch('builtins.open', new_callable=mock_open, read_data="not empty")
+    def test_validateToken_not_empty(self, mock_file):
+        # Simulate a GET request to the /Validator route when the file is not empty
+        response = self.app.get('/Validator')
+
+        # Verify that the function behaved as expected
+        self.assertEqual(response.get_json(), {'status': 200})  # The response should be 200
 
     #parameters: 
     #description: test server, the server should obtain tokens in altru 

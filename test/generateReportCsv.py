@@ -1,38 +1,49 @@
 import pandas as pd
 import coverage
 import unittest
+import io
+import re
 
-# Ejecuta tus pruebas con coverage
+# Run your tests with coverage
 cov = coverage.Coverage()
 cov.start()
 
-# Crea un cargador de pruebas y una suite de pruebas
+# Create a test loader and a test suite
 loader = unittest.TestLoader()
 suite = unittest.TestSuite()
 
-# Añade las pruebas de cada archivo a la suite de pruebas
+# Add the tests from each file to the test suite
 for test_file in ['testApp.py', 'testAuthAltru.py', 'testAuthSalesforce.py', 'testDataProcessor.py']:
     tests = loader.discover(start_dir='.', pattern=test_file)
     suite.addTests(tests)
 
-# Ejecuta la suite de pruebas
+# Run the test suite
 runner = unittest.TextTestRunner()
 runner.run(suite)
 
 cov.stop()
 cov.save()
 
-# Obtiene los datos de cobertura
-data = cov.get_data()
-files = data.measured_files()
+# Create a text file in memory to capture the output of the report
+file = io.StringIO()
+cov.report(file=file)
 
+# Get the output of the report as a string
+report = file.getvalue()
+
+# Parse the output of the report to get the coverage percentages
 coverage_data = []
-for file in files:
-    _, executable_lines, _, executed_lines, _ = cov.analysis2(file)
-    coverage_data.append([file, len(executable_lines), len(executed_lines)])
+for line in report.split('\n'):
+    match = re.search(r'(.*)\s+(\d+)\s+(\d+)\s+(\d+)%', line)
+    if match:
+        file, statements, missed, coverage = match.groups()
+        coverage_data.append([file, int(statements), int(missed), int(coverage)])
 
-# Convierte los datos a un DataFrame de pandas
-df = pd.DataFrame(coverage_data, columns=['File', 'Executable Lines', 'Executed Lines'])
+# Convert the coverage data into a pandas DataFrame
+df = pd.DataFrame(coverage_data, columns=['File', 'Statements', 'Missed', 'Coverage'])
 
-# Guarda el DataFrame en un archivo CSV
-df.to_csv('coverage_report.csv')
+# Add the "%" symbol at the end of each number in the coverage column
+df['Coverage'] = df['Coverage'].apply(lambda x: f'{x}%')
+
+# Save the DataFrame to a CSV file
+df.to_csv('coverage_report.csv', index=False)
