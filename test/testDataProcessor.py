@@ -65,18 +65,6 @@ class TestDataProcessor(unittest.TestCase):
         mock_writer.assert_called_once()
         self.assertEqual(mock_open.call_count, 2)
 
-    #parameters: 
-    #description: test test_delete_columns
-    #return: result of the test delete_columns
-    @patch('builtins.open', new_callable=MagicMock)
-    @patch('csv.reader', return_value=iter([["header1", "header2", "header3"], ["value1", "value2", "value3"]]))
-    @patch('csv.writer', return_value=MagicMock())
-    def test_delete_columns(self, mock_writer, mock_reader, mock_open):
-        self.processor.delete_columns("csv_input", ["header2"], "csv_output")
-
-        self.assertEqual(mock_open.call_count, 2)
-        mock_reader.assert_called_once()
-        mock_writer.assert_called_once()
 
     #parameters: 
     #description: test modify csv name
@@ -105,24 +93,94 @@ class TestDataProcessor(unittest.TestCase):
         self.assertEqual(mock_open.call_count, 2)
 
     #parameters: 
+    #description: test modify csv households
+    #return: result of the test csv households
+    @patch('builtins.open', new_callable=MagicMock)
+    @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name"], ["name", "last_name"]]))
+    @patch('csv.writer', return_value=MagicMock())
+    def test_modify_csv_households(self, mock_writer, mock_reader, mock_open):
+        self.processor.modify_csv_households("input_csv", "output_csv")
+
+        mock_reader.assert_called_once()
+        mock_writer.assert_called_once()
+        self.assertEqual(mock_open.call_count, 2)
+
+    #parameters: 
+    #description: test modify csv contacts
+    #return: result of the test csv contacts
+    @patch('builtins.open', new_callable=MagicMock)
+    @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name"], ["name", "last_name"]]))
+    @patch('csv.writer', return_value=MagicMock())
+    def test_modify_csv_contacts(self, mock_writer, mock_reader, mock_open):
+        self.processor.modify_csv_contacs("input_csv", "output_csv")
+
+        mock_reader.assert_called_once()
+        mock_writer.assert_called_once()
+        self.assertEqual(mock_open.call_count, 2)
+
+    #parameters: 
+    #description: test modify csv address of contacts
+    #return: result of the test csv address of contacts
+    @patch('builtins.open', new_callable=MagicMock)
+    @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name", 'Addresses\\Address', 'Addresses\\ZIP'], ["name", "last_name", "address", "0000"]]))
+    @patch('csv.writer', return_value=MagicMock())
+    def test_modify_csv_contacs_address(self, mock_writer, mock_reader, mock_open):
+        self.processor.modify_csv_contacs_address("input_csv", "output_csv")
+
+        mock_reader.assert_called_once()
+        mock_writer.assert_called_once()
+        self.assertEqual(mock_open.call_count, 2)
+
+    #parameters: 
+    #description: test modify csv emails of contacts
+    #return: result of the test csv emails of contacts
+    @patch('builtins.open', new_callable=MagicMock)
+    @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name", "Email Addresses\\Email address"], ["name", "last_name", "asdadadasd@asdadasdasd.com"]]))
+    @patch('csv.writer', return_value=MagicMock())
+    def test_modify_csv_contacs_email(self, mock_writer, mock_reader, mock_open):
+        self.processor.modify_csv_contacs_email("input_csv", "output_csv")
+        mock_reader.assert_called_once()
+        mock_writer.assert_called_once()
+        self.assertEqual(mock_open.call_count, 2)
+
+    #parameters: 
+    #description: test modify csv phones of contacts
+    #return: result of the test csv phones of contacts
+    @patch('builtins.open', new_callable=MagicMock)
+    @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name", "Phones\\Number"], ["name", "last_name", "3123123213"]]))
+    @patch('csv.writer', return_value=MagicMock())
+    def test_modify_csv_contacs_phones(self, mock_writer, mock_reader, mock_open):
+        self.processor.modify_csv_phones("input_csv", "output_csv")
+        mock_reader.assert_called_once()
+        mock_writer.assert_called_once()
+        self.assertEqual(mock_open.call_count, 2)
+
+    #parameters: 
     #description: test process data
     #return: result of the test process data
     @patch.object(DataProcessor, 'get_id')
     @patch.object(DataProcessor, 'get_query')
     @patch.object(DataProcessor, 'json_to_csv')
-    @patch.object(DataProcessor, 'delete_columns')
     @patch.object(DataProcessor, 'modify_csv_names')
     @patch.object(DataProcessor, 'modify_csv_phone')
+    @patch.object(DataProcessor, 'modify_csv_households')
+    @patch.object(DataProcessor, 'modify_csv_contacs')
+    @patch.object(DataProcessor, 'modify_csv_contacs_address')
+    @patch.object(DataProcessor, 'modify_csv_contacs_email')
+    @patch.object(DataProcessor, 'modify_csv_phones')
     @patch('csv.reader', return_value=iter([["Name", "Last/Organization/Group/Household name", "Addresses\\Address", "Addresses\\ZIP"], ["name", "last_name", "address", "zip"]]))
-    def test_process_data(self, mock_reader, mock_modify_csv_phone, mock_modify_csv_names, mock_delete_columns, mock_json_to_csv, mock_get_query, mock_get_id):
+    def test_process_data(self, mock_reader, mock_modify_csv_phone, mock_modify_csv_names, mock_modify_csv_households, mock_modify_csv_contacs , mock_modify_csv_contacs_address, mock_modify_csv_contacs_email, mock_modify_csv_phones , mock_json_to_csv, mock_get_query, mock_get_id):
         self.processor.process_data()
         mock_get_id.assert_called()
         mock_get_query.assert_called()
         mock_json_to_csv.assert_called()
-        mock_delete_columns.assert_called()
         mock_modify_csv_names.assert_called()
         mock_modify_csv_phone.assert_called()
-
+        mock_modify_csv_households.assert_called()
+        mock_modify_csv_contacs.assert_called()
+        mock_modify_csv_contacs_address.assert_called()
+        mock_modify_csv_contacs_email.assert_called()
+        mock_modify_csv_phones.assert_called()
 
 if __name__ == '__main__':
     unittest.main()

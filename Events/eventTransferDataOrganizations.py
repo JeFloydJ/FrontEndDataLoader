@@ -426,24 +426,23 @@ class DataProcessor:
         for report_name in report_names:
             id_value = self.get_id(report_name)
             self.get_query(id_value, report_name)
-            self.json_to_csv(ABS_PATH.format(f'Events/{report_name}_response.json'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            
-            # if report_name == "Veevart Organizations Report test":
-            #     self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            # elif report_name == "Veevart Organization Addresses Report test":
-            #     self.modify_csv_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            # elif report_name == "Veevart Organization Phones Report test":
-            #     self.modify_csv_phone(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            # elif report_name == "Veevart HouseHolds Report test":
-            #     self.modify_csv_households(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            # elif report_name == "Veevart Contacts Report Address test":
-            #     self.modify_csv_contacs_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            # elif report_name == "Veevart Contacts Report Email test":
-            #     self.modify_csv_contacs_email(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            # elif report_name == "Veevart Contacts Report test":
-            #     self.modify_csv_contacs(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
-            # elif report_name == "Veevart Contacts Report Phones test":
-            #     self.modify_csv_phones(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            self.json_to_csv(ABS_PATH.format(f'Events/{report_name}_response.json'), ABS_PATH.format(f'Events/{report_name}_output.csv'))            
+            if report_name == "Veevart Organizations Report test":
+                self.modify_csv_names(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Organization Addresses Report test":
+                self.modify_csv_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Organization Phones Report test":
+                self.modify_csv_phone(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart HouseHolds Report test":
+                self.modify_csv_households(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report Address test":
+                self.modify_csv_contacs_address(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report Email test":
+                self.modify_csv_contacs_email(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report test":
+                self.modify_csv_contacs(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
+            elif report_name == "Veevart Contacts Report Phones test":
+                self.modify_csv_phones(ABS_PATH.format(f'Events/{report_name}_output.csv'), ABS_PATH.format(f'Events/{report_name}_output.csv'))
 
 #parameters: 
 #description: sent information of the csv file to salesforce 
