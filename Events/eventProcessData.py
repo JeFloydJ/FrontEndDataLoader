@@ -15,6 +15,9 @@ load_dotenv()
 aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
 aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 
+#parameters: 
+#description: get data in s3, 
+#return: clean data with others personal information in csv files
 class DataProcessor:
     def __init__(self, bucket_name):
         self.s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
@@ -27,6 +30,9 @@ class DataProcessor:
         data = csv.reader(StringIO(csv_string))
         return data
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_names(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -67,6 +73,9 @@ class DataProcessor:
 
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_address(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -105,6 +114,9 @@ class DataProcessor:
 
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_phones(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -138,6 +150,9 @@ class DataProcessor:
 
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_households(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -160,6 +175,9 @@ class DataProcessor:
         csv_output_string = f.getvalue()
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_contacs(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -186,6 +204,9 @@ class DataProcessor:
         csv_output_string = f.getvalue()
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_phones(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -215,6 +236,9 @@ class DataProcessor:
         csv_output_string = f.getvalue()
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_contacs_email(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -245,6 +269,9 @@ class DataProcessor:
         csv_output_string = f.getvalue()
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information
     def modify_csv_contacs_address(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -276,7 +303,10 @@ class DataProcessor:
         writer.writerows(data)
         csv_output_string = f.getvalue()
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
-                
+
+    #parameters: object key, name of file in aws
+    #description: change personal information in csv file
+    #return: csv file with changed information 
     def display_csv(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
@@ -286,6 +316,10 @@ class DataProcessor:
         pd.set_option('max_colwidth', None)
         data = pd.read_csv(StringIO(csv_string), delimiter=';')
         print(data)
+
+    #parameters: 
+    #description: change personal information in all csv files
+    #return: csv file with changed information 
     def process_data(self):
         self.modify_csv_names('Veevart Organizations Report test.csv')
         self.modify_csv_address('Veevart Organization Addresses Report test.csv')
