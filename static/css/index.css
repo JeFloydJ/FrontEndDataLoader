@@ -36,14 +36,14 @@
 }
 
 .transfer-data-salesforce {
-    background-color: #D9D9D9;
-    color: black;
+    background-color: #007bff;
+    color: rgb(255, 255, 255);
     font-size: 20px;           
 }
 
 .altru-login {
-    background-color: #D9D9D9;
-    color: black;
+    background-color: #007bff;
+    color: rgb(255, 255, 255);
     font-size: 20px;
     cursor: pointer;
 }
@@ -53,15 +53,15 @@
     height: 60px; 
     margin: 30px; 
     border: none;
-    background-color: #D9D9D9;
-    color: black;
+    background-color: #007bff;
+    color: rgb(255, 255, 255);
     font-size: 20px;  
     cursor: pointer;
 }
 
 .salesforce-login {
-    background-color: #D9D9D9;
-    color: black;
+    background-color: #007bff;
+    color: rgb(255, 255, 255);
     font-size: 20px;  
 }
 
@@ -78,36 +78,40 @@
 }
 
 .app-button:hover {
-    background-color: #B8B8B8; 
+    background-color: #0056b3; 
 }
 
 .Connected-button:hover {
-    background-color: #B8B8B8; 
+    background-color: #0056b3; 
 }
 
 .transfer-button:hover {
-    background-color: #B8B8B8; 
+    background-color: #0056b3; 
 }
 
 .login-button:hover {
-    background-color: #B8B8B8; 
+    background-color: #0056b3; 
 }
 
 .salesforce-login:hover {
-    background-color: #B8B8B8; 
+    background-color: #0056b3; 
 }
 
 .app-button.connected,
 .Connected-button.connected {
-    background-color: #B8B8B8; 
+    background-color: #0056b3; 
     cursor: default; 
-    color: #797979;
+    color: #191367;
+    width:  70%; 
+    height: 70px; 
+    margin: 50px; 
+    border: none;
 }
 
 .app-button.connected:hover,
 .Connected-button.connected:hover {
-    background-color: #B8B8B8;
-    color: #797979; 
+    background-color: #0056b3;
+    color: #191367; 
 }
 
 .text-container {
@@ -144,4 +148,117 @@
     font-size: 20px;
     font-weight: bold;
     font-family: 'inter';
+}
+
+.test{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.jumbotron {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    margin: 20px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.lead {
+    font-size: 1.25em;
+    margin: 20px 0;
+    line-height: 1.6;
+    color: #000000;
+}
+
+.centered-text {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.5em;
+}
+
+
+form {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input[type="file"] {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+
+input[type="file"]::-webkit-file-upload-button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    font-size: 1.1em;
+}
+
+input[type="submit"], button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    font-size: 1.1em;
+}
+
+input[type="submit"]:hover, button:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    .jumbotron {
+        margin: 10px;
+    }
+}
+
+.jumbotron {
+    border-radius: 15px;
+}
+
+.lead {
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+form {
+    background-color: #f8f9fa;
+    color: rgb(111, 111, 111);
+    padding: 20px;
+    margin: 20px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+input[type="file"], input[type="submit"], button {
+    font-size: 1.1em;
+}
+
+input[type="submit"], button {
+    margin-top: 20px;
+}
+.h1{
+    font-family: 'Arial', sans-serif;
 }

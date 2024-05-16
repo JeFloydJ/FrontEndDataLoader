@@ -1,7 +1,8 @@
 # Import necessary modules
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, jsonify
 import logging
 import requests
+import csv
 import urllib.parse
 from dotenv import load_dotenv
 from auth.authAltru import authAltru
@@ -9,6 +10,15 @@ from auth.authSalesforce import authSalesforce
 from Events.eventTransferDataOrganizations import Adapter
 import subprocess
 import os
+import boto3
+from dotenv import load_dotenv
+from botocore.exceptions import NoCredentialsError
+
+
+aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+
+s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
 
 # Load environment variables
 load_dotenv()
@@ -52,18 +62,19 @@ token_urls = {
 }
 
 # List of files with tokens
-token_files = ['altru_token.txt', 'altru_refresh_token.txt', 'salesforce_token.txt', 'salesforce_refresh_token.txt', 'salesforce_instance.txt']
+token_files = ['altru_token.txt', 'altru_refresh_token.txt', 'salesforce_token.txt', 'salesforce_refresh_token.txt', 'salesforce_instance.txt', 'data.txt', 'finish.txt']
 
 #List of reports and csv files
-special_files = ['Veevart Organization Addresses Report test_output.csv', 'Veevart Organization Addresses Report test_response.json', 'Veevart Organization Phones Report test_output.csv', 'Veevart Organization Phones Report test_response.json', 'Veevart Organizations Report test_output.csv', 'Veevart Organizations Report test_response.json', 'Veevart HouseHolds Report test_response.json', 'Veevart HouseHolds Report test_output.csv', 'Veevart Contacts Report test_response.json', 'Veevart Contacts Report test_output.csv', 'Veevart Contacts Report Phones test_response.json', 'Veevart Contacts Report Phones test_output.csv', 'Veevart Contacts Report Email test_response.json', 'Veevart Contacts Report Email test_output.csv', 'Veevart Contacts Report Address test_response.json', 'Veevart Contacts Report Address test_output.csv']
+#special_files = ['Veevart Organization Addresses Report test_output.csv', 'Veevart Organization Addresses Report test_response.json', 'Veevart Organization Phones Report test_output.csv', 'Veevart Organization Phones Report test_response.json', 'Veevart Organizations Report test_output.csv', 'Veevart Organizations Report test_response.json', 'Veevart HouseHolds Report test_response.json', 'Veevart HouseHolds Report test_output.csv', 'Veevart Contacts Report test_response.json', 'Veevart Contacts Report test_output.csv', 'Veevart Contacts Report Phones test_response.json', 'Veevart Contacts Report Phones test_output.csv', 'Veevart Contacts Report Email test_response.json', 'Veevart Contacts Report Email test_output.csv', 'Veevart Contacts Report Address test_response.json', 'Veevart Contacts Report Address test_output.csv']
 
 # delete the content in each token file 
 for filename in token_files:
     open(filename, 'w').close()
 
 #delete content in each csv and json file
-for filename in special_files:
-    open((ABS_PATH.format(f'Events/{filename}')), 'w').close()
+# for filename in special_files:
+#     open((ABS_PATH.format(f'Events/{filename}')), 'w').close()
+
 
 #parameters: file of text
 #description: verify if the file is empty
@@ -71,7 +82,7 @@ for filename in special_files:
 def isEmpty(file):
     return not bool(file.read())
 
-@app.route('/Validator')
+@app.route('/Validator') 
 def validateToken():
     statusValidator = 404
     try:
@@ -80,6 +91,32 @@ def validateToken():
     finally:
         return {'status': statusValidator}
 
+@app.route('/upload', methods=["POST"])
+def upload():
+    if request.method == 'POST':
+        if request.files:
+            uploaded_files = request.files.getlist("filename")
+            for file in uploaded_files:
+                # Read the file as a CSV before uploading to S3
+                csv_file = csv.reader(file.read().decode('utf-8').splitlines())
+                # Reset file pointer to beginning before uploading to S3
+                file.seek(0)
+                s3.upload_fileobj(file, os.getenv('BUCKET_NAME'), file.filename)
+            try:
+                with open('data.txt', 'w') as f:
+                    f.write('data subida')
+
+            except Exception as e:
+                logger.error(f"Error writing to file: {e}")
+    return redirect('/')
+
+
+@app.route('/delete', methods=["POST"])
+def delete():
+    file_name = 'Veevart Organizations Report test.csv'
+    bucket_name = os.getenv('BUCKET_NAME')
+    s3.delete_object(Bucket=bucket_name, Key=file_name)
+    return redirect('/')
 
 #parameters: 
 #description: the main page of this project, decided wich page render depends of the auths
@@ -87,9 +124,11 @@ def validateToken():
 @app.route('/')
 def index():
     #variables for know in wich service is auth
-    loggedSkyApi = False
+    # loggedSkyApi = False
     loggedSalesforce = False
+    awsData = False
     transferData = False
+    transferPage = False
     
     #if is logged in salesforce, the variable its True 
     with open('salesforce_token.txt', 'r') as f:
@@ -97,17 +136,23 @@ def index():
             loggedSalesforce = True 
 
     #if is logged in Sky Api, the variable its True
-    with open('altru_token.txt', 'r') as f:
+    # with open('altru_token.txt', 'r') as f:
+    #     if(not(isEmpty(f))):
+    #         loggedSkyApi = True
+
+    with open('data.txt', 'r') as f:
         if(not(isEmpty(f))):
-            loggedSkyApi = True
-    
-    for filename in special_files:
-        with open((ABS_PATH.format(f'Events/{filename}')), 'r') as f:
-            if(not(isEmpty(f))):
-                transferData = True
+            awsData = True 
+
+    with open('finish.txt', 'r') as f:
+        if(not(isEmpty(f))):
+            transferData = True 
+
+    if loggedSalesforce and awsData:
+        transferPage = True
  
     # Render the index page
-    return render_template('index.html', loggedSkyApi = loggedSkyApi, loggedSalesforce = loggedSalesforce, transferData = transferData)
+    return render_template('index.html', transferPage = transferPage, loggedSalesforce = loggedSalesforce, transferData = transferData, awsData = awsData)
 
 
 #parameters: 

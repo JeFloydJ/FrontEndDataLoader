@@ -32,18 +32,31 @@ cov.report(file=file)
 report = file.getvalue()
 
 # Parse the output of the report to get the coverage percentages
-coverage_data = []
+# Asumiendo que tienes la información para algunas de las nuevas columnas en las siguientes variables
+source = "Migration Tool"
+external_id = ""  # Aquí debes poner tu ID externo
+repository = "a2oVs0000002KfNIAU"
+product = "Migration Tool"
+
+# Parse the output of the report to get the coverage percentages
+coverage_data = [] 
 for line in report.split('\n'):
     match = re.search(r'(.*)\s+(\d+)\s+(\d+)\s+(\d+)%', line)
     if match:
         file, statements, missed, coverage = match.groups()
-        coverage_data.append([file, int(statements), int(missed), int(coverage)])
+        # Aquí es donde extraemos la parte específica del string
+        start_index = file.find('FrontendDataLoader')
+        if start_index != -1:
+            path_name = file[start_index:]
+        else:
+            path_name = file
+        coverage_data.append([source, external_id, repository, path_name, int(statements), int(missed), int(statements) + int(missed), f'{int(coverage)}%', product])
 
 # Convert the coverage data into a pandas DataFrame
-df = pd.DataFrame(coverage_data, columns=['File', 'Statements', 'Missed', 'Coverage'])
+df = pd.DataFrame(coverage_data, columns=['Source', 'External Id', 'Repository', 'Path Name', 'Cover Lines', 'Uncover Code Lines', 'Lines', 'Coverage Status', 'Product'])
 
-# Add the "%" symbol at the end of each number in the coverage column
-df['Coverage'] = df['Coverage'].apply(lambda x: f'{x}%')
+# Y luego guardas el DataFrame en un archivo CSV de la misma manera que antes
+df.to_csv('coverage_report.csv', index=False)
 
 # Save the DataFrame to a CSV file
 df.to_csv('coverage_report.csv', index=False)

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/index.css')}}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{{url_for('static', filename='scripts/loading.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/formAction.js')}}"></script>
 </head>
 <body>
     <div class="login-container">
@@ -19,29 +20,59 @@
                     <li> Contact </li>
                 </ul>
             </div>      
-        {% elif loggedSkyApi and loggedSalesforce %}
-            <div class="button-container">
-                <button class="altru-login Connected-button connected">Connected with Altru</button>
-                <button class="salesforce-login Connected-button connected">Connected with Salesforce</button>
+        {% elif transferPage and loggedSalesforce %}
+        <h1 style='text-align: center'>Load csv app</h1>
+        <div class = 'test'>
+            <div class="jumbotron">
+                <div>
+                    <p class="lead centered-text">Upload a csv file</p>
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                        <input type="file" id="myFile" name="filename" accept=".csv" multiple>
+                        <input type="submit" name="action" value="Upload" onclick="setAction('upload')">
+                        <input type="submit" name="action" value="Delete File" onclick="setAction('delete')">
+                    </form>
+                </div>
             </div>
-            <button class="transfer-data-salesforce transfer-button" onClick = "startTransfer()">Transfer Data to Salesforce</button>
-        {% elif loggedSkyApi %}
             <div class="login-button-container">
-                <button class="app-button connected"> Connected with Sky API</button>
-                <button class="app-button" onclick="location.href='/auth/salesforce'"> Log in with Salesforce</button>
-            </div>
-        {% elif loggedSalesforce %}
-            <div class="login-button-container">
-                <button class="app-button" onclick="location.href='/auth/altru'"> Log in with Sky API</button>
                 <button class="app-button connected" > Connected with Salesforce</button>
             </div>
-        {% else %}
+        </div>
+        <button class="transfer-data-salesforce transfer-button" onClick = "startTransfer()">Transfer Data to Salesforce</button>
+        {% elif loggedSalesforce %}
+        <h1 style='text-align: center'>Load csv app</h1>
+        <div class = "test">
+            <div class="jumbotron">
+                <div>
+                    <p class="lead centered-text">Upload a csv file</p>
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                        <input type="file" id="myFile" name="filename" accept=".csv" multiple>
+                        <input type="submit" name="action" value="Upload" onclick="setAction('upload')">
+                        <input type="submit" name="action" value="Delete File" onclick="setAction('delete')">
+                    </form>
+                </div>
+            </div>
             <div class="login-button-container">
-                <button class="app-button" onclick="location.href='/auth/altru'"> Log in with Sky API</button>
+                <button class="app-button connected" > Connected with Salesforce</button>
+            </div>
+        </div>
+        {% else %}
+        <h1 style='text-align: center'>Load csv app</h1>
+        <div class = "test">
+            <div class="jumbotron">
+                <div>
+                    <p class="lead centered-text">Upload a csv file</p>
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                        <input type="file" id="myFile" name="filename" accept=".csv" multiple>
+                        <input type="submit" name="action" value="Upload" onclick="setAction('upload')">
+                        <input type="submit" name="action" value="Delete File" onclick="setAction('delete')">
+                    </form>
+                </div>
+            </div>            
+            <div class="login-button-container">
                 <button class="app-button" onclick="location.href='/auth/salesforce'"> Log in with Salesforce</button>
             </div>
+        </div>        
         {% endif %}
-    </div>
     <div id="loading" style="display: none;">
         <h2>Transfiriendo datos a Salesforce...</h2>
         <div id="progress">0%</div> 

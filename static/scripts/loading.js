@@ -1,5 +1,5 @@
 var retryCount = 0; // Contador de reintentos
-const maxRetries = 10; // Máximo número de reintentos
+const maxRetries = 20; // Máximo número de reintentos
 const baseDelay = 500; // Retraso inicial de 5 segundos
 
 function startTransfer() {

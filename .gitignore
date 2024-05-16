@@ -2,8 +2,14 @@
 
 venv/
 
+/venv
+
 out.txt.log
 
 __pycache__
 
 .DS_Store
+
+test.html
+
+example.css
