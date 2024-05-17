@@ -96,7 +96,7 @@ class SalesforceProcessor:
             'Auctifera__Implementation_External_ID__c': row['Lookup ID'],
             'Name': row['"Name"'],
             'Website': row['Web address'],
-            'vnfp__Do_not_Email__c' : False if row['Email Addresses\\Do not email'] != 'Yes' else True,
+            #'vnfp__Do_not_Email__c' : False if row['Email Addresses\\Do not email'] != 'Yes' else True,
         }
         if row['Email Addresses\\Email address'] != '':
             account_info['Auctifera__Email__c'] = row['Email Addresses\\Email address']
@@ -170,8 +170,8 @@ class SalesforceProcessor:
             'FirstName' : row['First name'],
             'LastName' : row['Last/Organization/Group/Household name'],
             'Auctifera__Implementation_External_ID__c' : row['Lookup ID'],
-            'Description' : row['Notes\\Notes'],
-            'GenderIdentity' : row['Gender'],
+            #'Description' : row['Notes\\Notes'],
+            #'GenderIdentity' : row['Gender'],
         }
         if account != '':
             contacts_info['Account'] = {'Auctifera__Implementation_External_ID__c': dic[account]}

@@ -40,6 +40,7 @@ class DataProcessor:
         f = StringIO(csv_string)
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
+        print(headers)
         headers[0] = headers[0].replace('\ufeff', '')  
         data = list(reader)
         email_index = headers.index("Email Addresses\\Email address")
@@ -57,8 +58,8 @@ class DataProcessor:
 
             if row[web_address_index]:
                 protocol, rest = row[web_address_index].split('//')
-                domain, path = rest.split('.com', 1)
-                row[web_address_index] = protocol + '//website.com' + path
+                # domain, path = rest.split('.com', 1)
+                row[web_address_index] = protocol + '//website.com' 
 
             if '@' in row[email_index]:
                 local, domain = row[email_index].split('@')
@@ -332,7 +333,8 @@ class DataProcessor:
         self.modify_csv_contacs_address('Veevart Contacts Report Address test.csv')
         #self.display_csv('Veevart Contacts Report Address test.csv')
 
-        
+# processor = DataProcessor(os.getenv('BUCKET_NAME'))       
+# processor.modify_csv_names('Veevart Organizations Report test.csv')
 # processor = DataProcessor(os.getenv('BUCKET_NAME'))
 # processor.process_data()
 # processor.modify_csv_names('Veevart Organizations Report test.csv')
