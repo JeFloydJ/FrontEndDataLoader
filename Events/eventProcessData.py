@@ -45,6 +45,7 @@ class DataProcessor:
         email_index = headers.index("Email Addresses\\Email address")
         web_address_index = headers.index("Web address")
         name_index = headers.index("Name")
+        #name_index = headers.index('"Name"')
         last_name_index = headers.index("Last/Organization/Group/Household name")
 
         for row in data:
@@ -81,9 +82,12 @@ class DataProcessor:
         f = StringIO(csv_string)
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
+        #print('antes',headers)
         headers[0] = headers[0].replace('\ufeff', '')  
+        #print(headers)
         data = list(reader)
-        name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
+        #name_index = headers.index('"Name"')
         last_name_index = headers.index("Last/Organization/Group/Household name")
         address_index = headers.index('Addresses\\Address')
         zip_index = headers.index('Addresses\\ZIP')
@@ -107,9 +111,8 @@ class DataProcessor:
         writer = csv.writer(f, delimiter=';')
         writer.writerow(headers)
         writer.writerows(data)
-
         csv_output_string = f.getvalue()
-
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
@@ -124,8 +127,8 @@ class DataProcessor:
         headers = next(reader)
         headers[0] = headers[0].replace('\ufeff', '')  
         data = list(reader)
-
-        name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
+        #name_index = headers.index('"Name"')
         last_name_index = headers.index("Last/Organization/Group/Household name")
         phone_index = headers.index('Phones\\Number')
 
@@ -139,13 +142,13 @@ class DataProcessor:
 
             if row[phone_index]:
                 row[phone_index] = row[phone_index][:5]
+
         f = StringIO()
         writer = csv.writer(f, delimiter=';')
         writer.writerow(headers)
         writer.writerows(data)
-
         csv_output_string = f.getvalue()
-
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
@@ -159,9 +162,10 @@ class DataProcessor:
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
         headers[0] = headers[0].replace('\ufeff', '')  
+        #print(headers)
         data = list(reader)
-        name_index = headers.index('"Name"')
-
+        #name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
         for row in data:
             if row[name_index]:
                 row[name_index] = row[name_index][:5]
@@ -171,6 +175,7 @@ class DataProcessor:
         writer.writerow(headers)
         writer.writerows(data)
         csv_output_string = f.getvalue()
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
@@ -184,8 +189,10 @@ class DataProcessor:
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
         headers[0] = headers[0].replace('\ufeff', '')  
+        #print(headers)
         data = list(reader)
-        name_index = headers.index('"Name"')
+        #name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
         last_name_index = headers.index('Last/Organization/Group/Household name')
 
         for row in data:
@@ -200,21 +207,24 @@ class DataProcessor:
         writer.writerow(headers)
         writer.writerows(data)
         csv_output_string = f.getvalue()
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
     #description: change personal information in csv file
     #return: csv file with changed information
-    def modify_csv_phones(self, object_key):
+    def modify_csv_contacts_phones(self, object_key):
         csv_obj = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
         body = csv_obj['Body']
         csv_string = body.read().decode('utf-8')
         f = StringIO(csv_string)
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
-        headers[0] = headers[0].replace('\ufeff', '')  
+        headers[0] = headers[0].replace('\ufeff', '')
+        #print(headers)  
         data = list(reader)
-        name_index = headers.index('"Name"')
+        #name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
         last_name_index = headers.index('Last/Organization/Group/Household name')
         phone_index = headers.index('Phones\\Number')
 
@@ -232,6 +242,7 @@ class DataProcessor:
         writer.writerow(headers)
         writer.writerows(data)
         csv_output_string = f.getvalue()
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
@@ -244,10 +255,11 @@ class DataProcessor:
         f = StringIO(csv_string)
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
-        headers[0] = headers[0].replace('\ufeff', '')  
+        headers[0] = headers[0].replace('\ufeff', '') 
+        # print(headers) 
         data = list(reader)
-
-        name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
+        #name_index = headers.index('"Name"')
         last_name_index = headers.index('Last/Organization/Group/Household name')                
         email_index = headers.index('Email Addresses\\Email address')
         for row in data:
@@ -265,6 +277,7 @@ class DataProcessor:
         writer.writerow(headers)
         writer.writerows(data)
         csv_output_string = f.getvalue()
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
@@ -278,8 +291,10 @@ class DataProcessor:
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
         headers[0] = headers[0].replace('\ufeff', '')  
+        # print(headers)
         data = list(reader)
-        name_index = headers.index('"Name"')
+        #name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
         last_name_index = headers.index('Last/Organization/Group/Household name')
         address_index = headers.index('Addresses\\Address')
         zip_index = headers.index('Addresses\\ZIP')
@@ -300,6 +315,7 @@ class DataProcessor:
         writer.writerow(headers)
         writer.writerows(data)
         csv_output_string = f.getvalue()
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
@@ -324,11 +340,10 @@ class DataProcessor:
         self.modify_csv_phones('Veevart Organization Phones Report test.csv')
         self.modify_csv_households('Veevart HouseHolds Report test.csv')
         self.modify_csv_contacs('Veevart Contacts Report test.csv')
-        self.modify_csv_phones('Veevart Contacts Report Phones test.csv')
-        self.modify_csv_contacs_email('Veevart Contacts Report Email test.csv')
+        self.modify_csv_contacts_phones('Veevart Contacts Report Phones test.csv')
         self.modify_csv_contacs_email('Veevart Contacts Report Email test.csv')
         self.modify_csv_contacs_address('Veevart Contacts Report Address test.csv')
-        #self.display_csv('Veevart Contacts Report Address test.csv')
+
 
 # processor = DataProcessor(os.getenv('BUCKET_NAME'))       
 # processor.modify_csv_names('Veevart Organizations Report test.csv')
@@ -339,11 +354,11 @@ class DataProcessor:
 # processor.modify_csv_phones('Veevart Organization Phones Report test.csv')
 # processor.modify_csv_households('Veevart HouseHolds Report test.csv')
 # processor.modify_csv_contacs('Veevart Contacts Report test.csv')
-# processor.modify_csv_phones('Veevart Contacts Report Phones test.csv')
-# processor.modify_csv_contacs_email('Veevart Contacts Report Email test.csv')
+# processor.modify_csv_contacts_phones('Veevart Contacts Report Phones test.csv')
 # processor.modify_csv_contacs_email('Veevart Contacts Report Email test.csv')
 # processor.modify_csv_contacs_address('Veevart Contacts Report Address test.csv')
 # processor.display_csv('Veevart Contacts Report Address test.csv')
         
-processor = DataProcessor(os.getenv('BUCKET_NAME'))
-processor.process_data()
+# processor = DataProcessor(os.getenv('BUCKET_NAME'))
+# processor.modify_csv_contacs_address('Veevart Contacts Report Address test.csv')
+# # processor.process_data()
