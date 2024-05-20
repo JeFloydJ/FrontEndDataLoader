@@ -40,12 +40,11 @@ class DataProcessor:
         f = StringIO(csv_string)
         reader = csv.reader(f, delimiter=';')
         headers = next(reader)
-        print(headers)
         headers[0] = headers[0].replace('\ufeff', '')  
         data = list(reader)
         email_index = headers.index("Email Addresses\\Email address")
         web_address_index = headers.index("Web address")
-        name_index = headers.index('"Name"')
+        name_index = headers.index("Name")
         last_name_index = headers.index("Last/Organization/Group/Household name")
 
         for row in data:
@@ -58,20 +57,18 @@ class DataProcessor:
 
             if row[web_address_index]:
                 protocol, rest = row[web_address_index].split('//')
-                # domain, path = rest.split('.com', 1)
                 row[web_address_index] = protocol + '//website.com' 
 
-            if '@' in row[email_index]:
+            if len(row) > email_index and '@' in row[email_index]:
                 local, domain = row[email_index].split('@')
-                row[email_index] = local + '@tmail.comx'
+                row[email_index] = local + '@tmail.comx'  # Cambio aquí: solo modifica la parte local del correo electrónico
 
         f = StringIO()
         writer = csv.writer(f, delimiter=';')
         writer.writerow(headers)
         writer.writerows(data)
-
         csv_output_string = f.getvalue()
-
+        csv_output_string = csv_output_string.replace('""Name""', 'Name')
         self.s3.put_object(Bucket=self.bucket_name, Key=object_key, Body=csv_output_string)
 
     #parameters: object key, name of file in aws
@@ -347,3 +344,6 @@ class DataProcessor:
 # processor.modify_csv_contacs_email('Veevart Contacts Report Email test.csv')
 # processor.modify_csv_contacs_address('Veevart Contacts Report Address test.csv')
 # processor.display_csv('Veevart Contacts Report Address test.csv')
+        
+processor = DataProcessor(os.getenv('BUCKET_NAME'))
+processor.process_data()

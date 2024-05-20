@@ -42,6 +42,7 @@ class Adapter:
         self.report_names = report_names
         self.dic_households_ids = {}
         self.dic_accounts = {}
+        
     #parameters: 
     #description: Processes data using the DataProcessor and sends address of contacts information to Salesforce
     #return: sent data

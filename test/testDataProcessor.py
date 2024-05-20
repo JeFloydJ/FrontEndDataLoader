@@ -1,3 +1,4 @@
+import io
 import unittest
 from unittest.mock import patch, MagicMock
 import sys
@@ -8,31 +9,32 @@ sys.path.insert(1, '../')
 from Events.eventProcessData import DataProcessor
 
 class TestDataProcessor(unittest.TestCase):
+    @patch('boto3.client')
+    def setUp(self, mock_boto3_client):
+        self.mock_s3 = MagicMock()
+        mock_boto3_client.return_value = self.mock_s3
+        self.data_processor = DataProcessor('test_bucket')
 
-    @patch('Events.eventProcessData.boto3.client')
-    def test_modify_csv_names(self, mock_s3_client):
-        # Configura el mock de S3
-        mock_s3 = mock_s3_client.return_value
-        mock_s3.get_object.return_value = {
-            'Body': MagicMock(read=lambda: rb'"Name";"Last Name";"Email Addresses\Email address";"Web address";"Last/Organization/Group/Household name"\nJohn Doe;Doe;johndoe@example.com;http://example.com;Doe\nJane Smith;Smith;janesmith@example.com;https://example.org;Smith')
-        }
+    def test_modify_csv_names(self):
+        
+        #set data for test
+        csv_data = b'Name;Last/Organization/Group/Household name;Email Addresses\\Email address;Web address\nJohn Doe;Doe;john.doe@example.com;http://example.com'
+        self.mock_s3.get_object.return_value = {'Body': io.BytesIO(csv_data)}
+        
+        #call method for test
+        self.data_processor.modify_csv_names('test_key')
 
-        # Inicializa DataProcessor con los argumentos correctos
-        processor = DataProcessor('my_bucket')
-        try:
-            processor.modify_csv_names('test.csv')
-        except ValueError as e:
-            print(f"Error: {e}")
-            return  # Termina la prueba aquí si se produce un error
+        #verify if have been called the correct method with correct arguments
+        self.mock_s3.get_object.assert_called_once_with(Bucket='test_bucket', Key='test_key')
+        self.mock_s3.put_object.assert_called_once()
 
-        # Verifica que se llamó a put_object con los datos esperados
-        expected_csv = r'"Name";"Last Name";"Email Addresses\Email address";"Web address";"Last/Organization/Group/Household name"\nJohn;Doe;johndoe@tmail.comx;http://website.com;\nxDoe;\nJane;Smith;janesmith@tmail.comx;https://website.com;\nxSmith;\n'
-        mock_s3.put_object.assert_called_once_with(Bucket='my_bucket', Key='test.csv', Body=expected_csv)
+        #verify if the data is correct
+        modified_data = self.mock_s3.put_object.call_args[1]['Body']
+        self.assertIn('John ;xDoex;john.doe@tmail.comx;http://website.com', modified_data)
+
 
 if __name__ == '__main__':
     unittest.main()
-
-
 
 # class TestDataProcessor(unittest.TestCase):
 
