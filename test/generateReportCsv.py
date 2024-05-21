@@ -13,7 +13,7 @@ loader = unittest.TestLoader()
 suite = unittest.TestSuite()
 
 # Add the tests from each file to the test suite
-for test_file in ['testApp.py', 'testAuthAltru.py', 'testAuthSalesforce.py', 'testDataProcessor.py']:
+for test_file in ['testApp.py', 'testAuthAltru.py', 'testAuthSalesforce.py', 'testDataProcessor.py', 'testDataTransfer.py']:
     tests = loader.discover(start_dir='.', pattern=test_file)
     suite.addTests(tests)
 
