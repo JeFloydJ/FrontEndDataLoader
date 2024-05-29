@@ -10,16 +10,8 @@ from auth.authSalesforce import authSalesforce
 from Events.eventTransferDataOrganizations import Adapter
 import subprocess
 import os
-import boto3
+import glob
 from dotenv import load_dotenv
-from botocore.exceptions import NoCredentialsError
-
-
-
-aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-
-s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
 
 # Load environment variables
 load_dotenv()
@@ -98,26 +90,32 @@ def upload():
         if request.files:
             uploaded_files = request.files.getlist("filename")
             for file in uploaded_files:
-                # Read the file as a CSV before uploading to S3
+                # Read the file as a CSV
                 csv_file = csv.reader(file.read().decode('utf-8').splitlines())
-                # Reset file pointer to beginning before uploading to S3
-                file.seek(0)
-                s3.upload_fileobj(file, os.getenv('BUCKET_NAME'), file.filename)
+                # Specify the path where you want to save the file on your PC
+                save_path = os.path.join(ABS_PATH.format('/data'), f'{file.filename}_output.csv')
+                # Save the file to the specified path
+                file.save(save_path)
             try:
                 with open('data.txt', 'w') as f:
                     f.write('data subida')
-
             except Exception as e:
                 logger.error(f"Error writing to file: {e}")
-    return redirect('/')
+            return jsonify({'message': 'Successfully saved', 'success': True})
+    return render_template('index.html')
 
 
 @app.route('/delete', methods=["POST"])
 def delete():
-    file_name = 'Veevart Organizations Report test.csv'
-    bucket_name = os.getenv('BUCKET_NAME')
-    s3.delete_object(Bucket=bucket_name, Key=file_name)
-    return redirect('/')
+    # Especifica la ruta donde están los archivos CSV
+    save_path = os.path.join(ABS_PATH.format('/data'), '*.csv')
+    # Encuentra todos los archivos CSV en la ruta especificada
+    files = glob.glob(save_path)
+    for file_name in files:
+        # Elimina cada archivo
+        os.remove(file_name)
+    return jsonify({'message': 'files deleted', 'success': True})
+
 
 #parameters: 
 #description: the main page of this project, decided wich page render depends of the auths
@@ -229,9 +227,9 @@ def getSalesforceToken():
         # Write the access token to a file
         with open(f'{service}_token.txt', 'w') as f:
             f.write(access_token)
-
+        logger.info(access_token)
         # Request an access token
-        token_url = "https://login.salesforce.com/services/oauth2/token"
+        token_url = "https://test.salesforce.com/services/oauth2/token"
         token_data = {
             "grant_type": "authorization_code",
             "code": access_token,
@@ -241,7 +239,7 @@ def getSalesforceToken():
         }
         token_response = requests.post(token_url, data=token_data)
         #logger.info(token_response)
-
+        logger.info(token_response)
         # If the token response is successful, write the tokens to files
         if token_response.status_code == 200:
             access_token = token_response.json()["access_token"]

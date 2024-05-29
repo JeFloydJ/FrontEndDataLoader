@@ -8,6 +8,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{{url_for('static', filename='scripts/loading.js')}}"></script>
     <script src="{{url_for('static', filename='scripts/formAction.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/alertMessage.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/uploadMessage.js')}}"></script>
 </head>
 <body>
     <div class="login-container">
@@ -29,7 +31,7 @@
                     <form id="upload-form" method="POST" enctype="multipart/form-data">
                         <input type="file" id="myFile" name="filename" accept=".csv" multiple>
                         <input type="submit" name="action" value="Upload" onclick="setAction('upload')">
-                        <input type="submit" name="action" value="Delete File" onclick="setAction('delete')">
+                        <input type="submit" name="action" value="Delete Files" onclick="setAction('delete')">
                     </form>
                 </div>
             </div>
@@ -47,7 +49,7 @@
                     <form id="upload-form" method="POST" enctype="multipart/form-data">
                         <input type="file" id="myFile" name="filename" accept=".csv" multiple>
                         <input type="submit" name="action" value="Upload" onclick="setAction('upload')">
-                        <input type="submit" name="action" value="Delete File" onclick="setAction('delete')">
+                        <input type="submit" name="action" value="Delete Files" onclick="setAction('delete')">
                     </form>
                 </div>
             </div>
@@ -64,7 +66,7 @@
                     <form id="upload-form" method="POST" enctype="multipart/form-data">
                         <input type="file" id="myFile" name="filename" accept=".csv" multiple>
                         <input type="submit" name="action" value="Upload" onclick="setAction('upload')">
-                        <input type="submit" name="action" value="Delete File" onclick="setAction('delete')">
+                        <input type="submit" name="action" value="Delete Files" onclick="setAction('delete')">
                     </form>
                 </div>
             </div>            
