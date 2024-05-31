@@ -75,6 +75,9 @@ for filename in token_files:
 def isEmpty(file):
     return not bool(file.read())
 
+#parameters: 
+#description: verify if the process to sent data is finished
+#return: status of process to sent data
 @app.route('/Validator') 
 def validateToken():
     statusValidator = 404
@@ -84,20 +87,19 @@ def validateToken():
     finally:
         return {'status': statusValidator}
 
+#parameters: 
+#description: add csv files to project 
+#return: store csv files
 @app.route('/upload', methods=["POST"])
 def upload():
     if request.method == 'POST':
         if request.files:
             uploaded_files = request.files.getlist("filename")
             for file in uploaded_files:
-                # Specify the path where you want to save the file on your PC
                 save_path = os.path.join(ABS_PATH.format('/data'), f'{file.filename}')
-                # Save the file to the specified path
                 file.save(save_path)
-                # Now that the file is saved, open it and read it as a CSV
                 with open(save_path, 'r') as f:
                     csv_file = csv.reader(f)
-                    # Rest of your code...
             try:
                 with open('data.txt', 'w') as f:
                     f.write('data subida')
@@ -106,16 +108,14 @@ def upload():
             return jsonify({'message': 'Successfully saved', 'success': True})
     return render_template('index.html')
 
-
-
+#parameters: 
+#description: delete csv files
+#return: csv files deleted
 @app.route('/delete', methods=["POST"])
 def delete():
-    # Especifica la ruta donde están los archivos CSV
     save_path = os.path.join(ABS_PATH.format('/data'), '*.csv')
-    # Encuentra todos los archivos CSV en la ruta especificada
     files = glob.glob(save_path)
     for file_name in files:
-        # Elimina cada archivo
         os.remove(file_name)
     return jsonify({'message': 'files deleted', 'success': True})
 

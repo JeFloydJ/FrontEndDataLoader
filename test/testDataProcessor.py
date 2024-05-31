@@ -12,9 +12,18 @@ import csv
 import os
 from Events.eventProcessData import DataProcessor  
 
+#parameters: 
+#description: test class that get info in sky api
+#return: result of the test
 class TestDataProcessor(unittest.TestCase):
+
+    #set up class DataProcessor
     def setUp(self):
-        self.data_processor = DataProcessor('test_path')  
+        self.data_processor = DataProcessor('test_path')
+
+    #parameters: 
+    #description: test modify csv households
+    #return: result of the test csv households  
     def test_modify_csv_households(self):
         with open('test_input.csv', 'w', newline='') as f:
             writer = csv.writer(f, delimiter=';')
@@ -35,6 +44,9 @@ class TestDataProcessor(unittest.TestCase):
         os.remove('test_input.csv')
         os.remove('test_output.csv')
 
+    #parameters: 
+    #description: test modify csv name
+    #return: result of the test modify csv name
     def test_modify_csv_names(self):
         with open('test_input.csv', 'w', newline='') as f:
             writer = csv.writer(f, delimiter=';')
@@ -57,6 +69,9 @@ class TestDataProcessor(unittest.TestCase):
         os.remove('test_input.csv')
         os.remove('test_output.csv')
 
+    #parameters: 
+    #description: test modify csv address
+    #return: result of the test modify csv address
     def test_modify_csv_address(self):
         with open('test_input.csv', 'w', newline='') as f:
             writer = csv.writer(f, delimiter=';')
@@ -79,6 +94,9 @@ class TestDataProcessor(unittest.TestCase):
         os.remove('test_input.csv')
         os.remove('test_output.csv')
 
+    #parameters: 
+    #description: test modify csv phone
+    #return: result of the test modify csv phone
     def test_modify_csv_phone(self):
 
         with open('test_input.csv', 'w', newline='') as f:
@@ -102,6 +120,9 @@ class TestDataProcessor(unittest.TestCase):
         os.remove('test_output.csv')
 
 
+    #parameters: 
+    #description: test modify csv address of contacts
+    #return: result of the test csv address of contacts
     def test_modify_csv_contacs_address(self):
 
         with open('test_input.csv', 'w', newline='') as f:
@@ -125,6 +146,9 @@ class TestDataProcessor(unittest.TestCase):
         os.remove('test_input.csv')
         os.remove('test_output.csv')
 
+    #parameters: 
+    #description: test modify csv emails of contacts
+    #return: result of the test csv emails of contacts
     def test_modify_csv_contacs_email(self):
 
         with open('test_input.csv', 'w', newline='') as f:
@@ -147,6 +171,9 @@ class TestDataProcessor(unittest.TestCase):
         os.remove('test_input.csv')
         os.remove('test_output.csv')
 
+    #parameters: 
+    #description: test modify csv of contacts
+    #return: result of the test csv of contacts
     def test_modify_csv_contacs(self):
         with open('test_input.csv', 'w', newline='') as f:
             writer = csv.writer(f, delimiter=';')
@@ -167,6 +194,10 @@ class TestDataProcessor(unittest.TestCase):
         os.remove('test_input.csv')
         os.remove('test_output.csv')
 
+
+    #parameters: 
+    #description: test modify csv of organization phones 
+    #return: result of the test csv of organization phones
     def test_modify_csv_phones(self):
 
         with open('test_input.csv', 'w', newline='') as f:

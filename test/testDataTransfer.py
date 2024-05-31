@@ -5,9 +5,13 @@ sys.path.insert(1, '../')
 from Events.eventDataTransfer import SalesforceProcessor
 
 #parameters: 
-#description: test class that get info in sky api
+#description: test class that sent data to salesforce
 #return: result of the test
 class TestSalesforceProcessor(unittest.TestCase):
+
+    #parameters: 
+    #description: set config to test
+    #return: result of the test
     @patch('os.getenv')
     @patch('builtins.open')
     @patch('Events.eventDataTransfer.Salesforce')
@@ -30,6 +34,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         
         self.processor = SalesforceProcessor('test_report')
 
+    #parameters: 
+    #description: test get households id
+    #return: result of the test
     def test_get_households_id(self):
 
         result = self.processor.get_households_id()
@@ -37,10 +44,16 @@ class TestSalesforceProcessor(unittest.TestCase):
 
         self.assertEqual(result, 'test_id')
 
+    #parameters: 
+    #description: set organization id
+    #return: result of the test
     def test_get_organizations_id(self):
         result = self.processor.get_organizations_id()
         self.assertEqual(result, 'test_id')
 
+    #parameters: 
+    #description: sget accounts id
+    #return: result of the test
     def test_get_account_id(self):
     
         mock_response = {'records': [{'Auctifera__Implementation_External_ID__c': 'test_id', 'AccountId': 'test_account_id'}]}
@@ -52,11 +65,17 @@ class TestSalesforceProcessor(unittest.TestCase):
         
         self.assertEqual(result, {'test_id': 'test_account_id'})
     
+    #parameters: 
+    #description: test extract code to string (123-householdsa-test_id)
+    #return: result of the test
     def test_find_households_id(self):
         lst = ['123-households-test_id']
         result = self.processor.find_households_id(lst)
         self.assertEqual(result, {'test_id': '123-households-test_id'})
 
+    #parameters: 
+    #description: test create organization object
+    #return: result of the test
     def test_handle_organizations_report(self):
         row = {
             "Lookup ID": "test_id",
@@ -68,6 +87,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.processor.handle_organizations_report(row)
         self.assertEqual(self.processor.account_list[0]['Auctifera__Implementation_External_ID__c'], 'test_id')
 
+    #parameters: 
+    #description: test create organization address object
+    #return: result of the test
     def test_handle_organization_addresses_report(self):
         row = {
             "Lookup ID": "test_id",
@@ -82,6 +104,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.processor.handle_organization_addresses_report(row, 1)
         self.assertEqual(self.processor.address_list[0]['npsp__MailingStreet__c'], 'test_address')
 
+    #parameters: 
+    #description: test organization phone object
+    #return: result of the test
     def test_handle_organization_phone_report(self):
   
         counter = 1  
@@ -99,6 +124,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.assertEqual(self.processor.phone_list[0]['vnfp__Type__c'], "Phone")
         self.assertEqual(self.processor.phone_list[0]['vnfp__Account__r'], {'Auctifera__Implementation_External_ID__c': 'test_id'})
 
+    #parameters: 
+    #description: test phone update in account object
+    #return: result of the test
     def test_handler_update_phone_organization(self):
 
         row = {
@@ -118,6 +146,9 @@ class TestSalesforceProcessor(unittest.TestCase):
             
             self.assertEqual(len(self.processor.phone_act_list), 0)
 
+    #parameters: 
+    #description: test update address in account object
+    #return: result of the test
     def test_handler_update_address_organization(self):
 
         row = {
@@ -144,7 +175,10 @@ class TestSalesforceProcessor(unittest.TestCase):
         else:
           
             self.assertEqual(len(self.processor.address_act_list), 0)
-            
+
+    #parameters: 
+    #description: test create household obejct
+    #return: result of the test            
     def test_handler_households(self):
 
         row = {
@@ -161,6 +195,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.assertEqual(self.processor.houseHolds_list[0]['Auctifera__Implementation_External_ID__c'], "1-households-123")
         self.assertEqual(self.processor.houseHolds_list[0]['Name'], "Test Name")
 
+    #parameters: 
+    #description: test create contact object
+    #return: result of the test
     def test_handler_contacts_report(self):
 
         row = {
@@ -187,6 +224,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.assertEqual(self.processor.contacts_list[0]['GenderIdentity'], "Test Gender")
         self.assertEqual(self.processor.contacts_list[0]['Account'], {'Auctifera__Implementation_External_ID__c': 'test_account_external_id'})
 
+    #parameters: 
+    #description: test create phone in contact object
+    #return: result of the test
     def test_handle_contacts_phone_report(self):
         row = {
             "Lookup ID": "test_id",
@@ -204,6 +244,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.assertEqual(self.processor.contacts_phones_list[0]['vnfp__Contact__r'], {'Auctifera__Implementation_External_ID__c': 'test_id'})
         self.assertEqual(self.processor.contacts_phones_list[0]['vnfp__Implementation_External_ID__c'], "1-phone-456")
 
+    #parameters: 
+    #description: test contact create email in contact object
+    #return: result of the test
     def test_handle_contacts_emails_report(self):
         row = {
             "Lookup ID": "test_id",
@@ -220,6 +263,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.assertEqual(self.processor.contacts_emails_list[0]['vnfp__Contact__r'], {'Auctifera__Implementation_External_ID__c': 'test_id'})
         self.assertEqual(self.processor.contacts_emails_list[0]['vnfp__Implementation_External_ID__c'], "1-contacts-email-456")
  
+    #parameters: 
+    #description: test create address object in contact object
+    #return: result of the test
     def test_handle_contacts_addresses_report(self):
         row = {
             "Lookup ID": "test_id",
@@ -249,6 +295,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         self.assertEqual(self.processor.contacts_address_list[0]['npsp__Default_Address__c'], True)
         self.assertEqual(self.processor.contacts_address_list[0]['vnfp__Implementation_External_ID__c'], "1-contacts-address-contacts456")
  
+    #parameters: 
+    #description: test update phone in contact object
+    #return: result of the test
     def test_handle_contacts_update_phone(self):
 
         row = {
@@ -265,6 +314,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         else:
             self.assertEqual(len(self.processor.contacts_act_phone), 1)
 
+    #parameters: 
+    #description: test create update email in contact object
+    #return: result of the test
     def test_handle_contacts_update_email(self):
         row = {
             "Lookup ID": "test_id",
@@ -280,6 +332,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         else:
             self.assertEqual(len(self.processor.contacts_act_email), 1)
 
+    #parameters: 
+    #description: test create objects  and sent organization data to salesforce 
+    #return: result of the test
     @patch('csv.DictReader')
     def test_process_organizations(self, mock_dict_reader):
 
@@ -306,6 +361,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         
         self.processor.sf.bulk.Account.upsert.assert_called_once_with(self.processor.account_list, 'Auctifera__Implementation_External_ID__c', batch_size='auto', use_serial=True)
 
+    #parameters: 
+    #description: test create objects and sent household data to salesforce 
+    #return: result of the test
     @patch('csv.DictReader')
     def test_process_households(self, mock_dict_reader):
         row = {
@@ -333,6 +391,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         
         self.assertEqual(result, self.processor.houseHolds_external_ids_list)
 
+    #parameters: 
+    #description: test extract households id 
+    #return: result of the test
     def test_process_households_ids(self):
         self.processor.houseHolds_external_ids_list = ['123-households-test_id']
         
@@ -340,6 +401,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         
         self.assertEqual(result, {'test_id': '123-households-test_id'})
 
+    #parameters: 
+    #description: test create objects  and sent contacts data to salesforce 
+    #return: result of the test
     @patch('csv.DictReader')
     def test_process_contacts(self, mock_dict_reader):
         row = {
@@ -376,6 +440,9 @@ class TestSalesforceProcessor(unittest.TestCase):
         
         self.assertEqual(result, self.processor.contacts_accounts_id)
 
+    #parameters: 
+    #description: test create objects and sent address of organization data to salesforce 
+    #return: result of the test
     @patch('csv.DictReader')
     def test_process_contact_address(self, mock_dict_reader):
         row = {
