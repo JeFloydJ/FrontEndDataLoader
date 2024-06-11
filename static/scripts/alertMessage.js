@@ -15,7 +15,6 @@ $(document).ready(function() {
             success: function(data) {
                 if (data.success) {
                     alert(successMessage);
-                    // Limpiar el formulario después de la carga exitosa del archivo
                     $('#upload-form')[0].reset();
                 }
             }
