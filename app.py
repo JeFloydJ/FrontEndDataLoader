@@ -96,7 +96,7 @@ def upload():
         if request.files:
             uploaded_files = request.files.getlist("filename")
             for file in uploaded_files:
-                save_path = os.path.join(ABS_PATH.format('/data'), f'{file.filename}')
+                save_path = os.path.join(ABS_PATH.format('data'), f'{file.filename}')
                 file.save(save_path)
                 with open(save_path, 'r') as f:
                     csv_file = csv.reader(f)
