@@ -250,15 +250,19 @@ def getSalesforceToken():
             instance = token_response.json()["instance_url"]
             logger.info(instance)
             try:
-                with open(f'{service}_token.txt', 'w') as f:
+                save_path_access = os.path.join(ABS_PATH.format('data'), f'{service}_token.txt')
+                with open(save_path_access, 'w') as f:
                     f.write(access_token)
-                with open(f'{service}_refresh_token.txt', 'w') as f:
+                save_path_refresh = os.path.join(ABS_PATH.format('data'), f'{service}_refresh_token.txt')
+                with open(save_path_refresh, 'w') as f:
                     f.write(refresh_token)
-                with open(f'{service}_instance.txt', 'w') as f:
+                save_path_instance = os.path.join(ABS_PATH.format('data'), f'{service}_instance.txt')
+                with open(save_path_instance, 'w') as f:
                     f.write(instance)
             except Exception as e:
-                logger.error(f"Error writing to file: {e}")
+                logger.error(f"Error writing tokens to file: {e}")
         else:
+            logger.warning(f"Token response error: {token_response.content}")
             logger.warning(f"Token response error: {token_response.content}")
     
     #logger.info(ans)
