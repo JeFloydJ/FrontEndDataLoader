@@ -101,7 +101,8 @@ def upload():
                 with open(save_path, 'r') as f:
                     csv_file = csv.reader(f)
             try:
-                with open('data.txt', 'w') as f:
+                save_data_path = os.path.join(ABS_PATH.format(''), 'data.txt')
+                with open(save_data_path, 'w') as f:
                     f.write('data subida')
             except Exception as e:
                 logger.error(f"Error writing to file: {e}")
@@ -250,19 +251,18 @@ def getSalesforceToken():
             instance = token_response.json()["instance_url"]
             logger.info(instance)
             try:
-                save_path_access = os.path.join(ABS_PATH.format('data'), f'{service}_token.txt')
+                save_path_access = os.path.join(ABS_PATH.format(''), f'{service}_token.txt')
                 with open(save_path_access, 'w') as f:
                     f.write(access_token)
-                save_path_refresh = os.path.join(ABS_PATH.format('data'), f'{service}_refresh_token.txt')
+                save_path_refresh = os.path.join(ABS_PATH.format(''), f'{service}_refresh_token.txt')
                 with open(save_path_refresh, 'w') as f:
                     f.write(refresh_token)
-                save_path_instance = os.path.join(ABS_PATH.format('data'), f'{service}_instance.txt')
+                save_path_instance = os.path.join(ABS_PATH.format(''), f'{service}_instance.txt')
                 with open(save_path_instance, 'w') as f:
                     f.write(instance)
             except Exception as e:
                 logger.error(f"Error writing tokens to file: {e}")
         else:
-            logger.warning(f"Token response error: {token_response.content}")
             logger.warning(f"Token response error: {token_response.content}")
     
     #logger.info(ans)

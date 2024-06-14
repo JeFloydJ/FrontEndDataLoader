@@ -1,6 +1,10 @@
 import os
 from Events.eventTransferDataOrganizations import Adapter
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(current_dir)
+ABS_PATH = os.path.join(BASE_DIR, "App", "{}")
+
 # Elimina el archivo 'finish.txt' si existe
 if os.path.exists('finish.txt'):
     os.remove('finish.txt')
@@ -24,5 +28,6 @@ adapter = Adapter(report_names)
 dic_accounts = adapter.process_data()
 
 # Escribe 'finish' en el archivo 'finish.txt'
-with open('finish.txt', 'w') as f:
+finish_path = os.path.join(ABS_PATH.format(''), 'finish.txt')
+with open(finish_path, 'w') as f:
     f.write('finish')
